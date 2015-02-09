@@ -1,0 +1,106 @@
+var webview = document.getElementById('webview');
+webview.style.display = 'inline-block';
+webview.style.position = 'absolute';
+webview.style.height = '100%';
+webview.style.width = '100%';
+webview.style.top = '50px';
+
+webview.addEventListener('contentload', function() {
+    //chrome.app.window.current().fullscreen();
+    console.log('Guest page loaded');
+    SendMsg("Ready?");
+    webview.addEventListener('consolemessage', function(e) {
+        var aMsg;
+        console.log(e.message);
+        if (/apimsg/.test(e.message)){
+            console.log("Я тут");
+            aMsg = JSON.parse(e.message.substr(7));
+        }
+        console.log(aMsg);
+        webviewHandler(aMsg);
+    });
+});
+
+function SendMsg(msg){
+    webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("FromPage", {detail: "' + msg + '"}))'});
+}
+
+var Module = [];
+
+function webviewHandler(aMsg){
+//    switch (aMsg.wvEvent){
+//        case "ReadyState" : console.log(aMsg.wvData); break;
+//        case "Test" : console.log(aMsg.wvData); break;
+//        case "Print" : console.log(aMsg.wvData); break;
+//        case "ToCOM" : connection.send(aMsg.wvData.count); break;
+//        default: console.log("Неизвестное событие"); break;
+//    }
+    Module[aMsg.DeviceType][aMsg.Action](aMsg.Data);
+}
+
+
+
+Module.weight = MercuryT100;
+
+function MercuryT100() {
+    this.evtName = 'MercuryT100';
+    //this.serial = new SerialConnection();
+    this.send_cost = function(aCost){
+            //this.serial.send(aCost);
+            console.log("Пришла цена на весы: " + aCost);
+    };
+}
+
+
+
+
+
+
+//
+//
+//function CommonProcessor(aModules) {
+//    this.evtName = 'cmn';
+//    this.processAppMessage = function(aData) {
+//
+//        //нужно весы подключить
+//        aModules.newModule(modName);
+//    };
+//}
+//
+//new (function ChromeHandler() {
+//    var modules = {};
+//    var ModulesFunc = getSettings();
+//    ModulesFunc.CommonProcessor = CommonProcessor;
+//    /*{
+//        CommonProcessor :   CommonProcessor,
+//        MercuryT100 :   MercuryT100
+//    };*/
+//    /*
+//     * Весы, принтер чеков
+//     */
+//    
+//    this.newModule = function(aModuleName) {
+//        var newMod = new ModulesFunc[aModuleName](this);
+//    }.bind(this);
+//    
+//    this.processMsg = function(aMsg) {
+//        if (modules[aMsg.evtName]) {
+//            modules[aMsg.evtName].processAppMessage(aMsg.evtData);
+//        } else {
+//            //Error handler
+//        }
+//    };
+//    
+//    this.newModule('CommonProcessor');
+//    this.consoleListener = new ConsoleListener(this);
+//})();
+//
+//function ConsoleListener(handler) {
+//    function readConsoleMessage(aMSG) {
+//        //check for tag and parse JSON
+//    }
+//    
+//    this.getMessage = function(aMsgData) {
+//        handler.processMsg(aMsgData);
+//    };
+//}

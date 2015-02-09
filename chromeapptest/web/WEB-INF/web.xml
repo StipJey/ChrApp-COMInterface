@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+  <context-param>
+    <param-name>default-datasource</param-name>
+    <param-value/>
+  </context-param>
+  <context-param>
+    <param-name>url</param-name>
+    <param-value>file:/C:/Users/Work/Documents/NetBeansProjects/chromeapptest/</param-value>
+  </context-param>
+  <listener>
+    <listener-class>com.eas.server.httpservlet.PlatypusSessionsSynchronizer</listener-class>
+  </listener>
+  <servlet>
+    <servlet-name>PlatypusServlet</servlet-name>
+    <servlet-class>com.eas.server.httpservlet.PlatypusHttpServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <multipart-config>
+      <location>C:/Users/Work/Documents/NetBeansProjects/chromeapptest/web/pub</location>
+      <max-file-size>2097152</max-file-size>
+      <max-request-size>2165824</max-request-size>
+      <file-size-threshold>1048576</file-size-threshold>
+    </multipart-config>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PlatypusServlet</servlet-name>
+    <url-pattern>/application/*</url-pattern>
+  </servlet-mapping>
+  <resource-ref>
+    <description>jdbc:h2:tcp://localhost/~/test_db [sa на PUBLIC]</description>
+    <res-ref-name>test_db</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+  <resource-ref>
+    <description>jdbc:postgresql://192.168.10.119:5432/cafeErp [cafeErp на cafeErp]</description>
+    <res-ref-name>cafeErp</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+  <resource-ref>
+    <description>jdbc:postgresql://party-ples.ru:5432/cafeErpDeveloper [remotedev на cafeerp]</description>
+    <res-ref-name>home-erpCafe</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+</web-app>

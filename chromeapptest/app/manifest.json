@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+    "offline_enabled": true,
+    "name": "Test Chrome App",
+    "description": "Тестирую связку platipus + Google Apps",
+    "version": "1.1",
+    "icons": {
+        "128": "128.png"
+    },
+    "app": {
+        "background": {
+            "scripts": ["start.js"]
+        }
+    },
+    "permissions": [
+        "webview",
+        "storage",
+        "usb",
+        "fullscreen", 
+        "alwaysOnTopWindows",
+        "serial"
+    ]
+}

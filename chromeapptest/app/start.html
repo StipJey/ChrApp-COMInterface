@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Chrome App!</title>
+    </head>
+    <body>
+        <!-- Box for choosing the port to connect to -->
+        <div id="connect_box" style="position: absolute; left : 0; top: 0">
+            <select id="port_list"><option>Please Wait...</option></select>
+            <button id="connect_button">Connect</button>
+        </div>
+        <webview id='webview' src="http://localhost:8080/chromeAppTest/application-start.html"></webview>
+        <script src="startWebview.js"></script>
+        <script src="serial.js"></script>
+    </body>
+</html>
