@@ -19,9 +19,9 @@ window.addEventListener("FromPage", function(evt) {
     function buttonActionPerformed(evt) {//GEN-FIRST:event_buttonActionPerformed
         
         var obj = {};
-        obj.DeviceType = "weight";
-        obj.Action = "send_cost";
-        obj.Data = cost;
+        obj.DeviceType = "scales";
+        obj.Action = "get_weight";
+        obj.Data = null;
         console.log("apimsg:" + JSON.stringify(obj));
     }//GEN-LAST:event_buttonActionPerformed
 }

@@ -1,21 +1,23 @@
 const serial = chrome.serial;
 
+var SerialOptions = {
+  bitrate : 4800,
+  parityBit : "even",
+  stopBits : "one"
+};
+
 /* Interprets an ArrayBuffer as UTF-8 encoded string data. */
-var ab2str = function(buf) {
+var parseWeight = function(buf) {
   var bufView = new Uint8Array(buf);
-  var encodedString = String.fromCharCode.apply(null, bufView);
-  return decodeURIComponent(escape(encodedString));
+  var a = "";
+  for(var i = 5; i>=0; i--){
+      a += bufView[i];
+  }
+  return parseInt(a);
 };
 
 /* Converts a string to UTF-8 encoding in a Uint8Array; returns the array buffer. */
-var str2ab = function(str) {
-  var encodedString = unescape(encodeURIComponent(str));
-  var bytes = new Uint8Array(encodedString.length);
-  for (var i = 0; i < encodedString.length; ++i) {
-    bytes[i] = encodedString.charCodeAt(i);
-  }
-  return bytes.buffer;
-};
+
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -45,18 +47,9 @@ SerialConnection.prototype.onReceive = function(receiveInfo) {
   if (receiveInfo.connectionId !== this.connectionId) {
     return;
   }
+  var E = getNextEvent();
+  Module[E.DeviceType][E.Action](receiveInfo.data);
 
-  var resp = ab2str(receiveInfo.data);
-  console.log(resp);
-  SendMsg(resp);
-  this.lineBuffer += resp; 
-
-  var index;
-  while ((index = this.lineBuffer.indexOf('\n')) >= 0) {
-    var line = this.lineBuffer.substr(0, index + 1);
-    this.onReadLine.dispatch(line);
-    this.lineBuffer = this.lineBuffer.substr(index + 1);
-  }
 };
 
 SerialConnection.prototype.onReceiveError = function(errorInfo) {
@@ -70,14 +63,15 @@ SerialConnection.prototype.getDevices = function(callback) {
 };
 
 SerialConnection.prototype.connect = function(path) {
-  serial.connect(path, this.onConnectComplete.bind(this))
+  serial.connect(path, SerialOptions, this.onConnectComplete.bind(this))
 };
 
-SerialConnection.prototype.send = function(msg) {
+SerialConnection.prototype.send = function(bytes) {
   if (this.connectionId < 0) {
     throw 'Invalid connection';
   }
-  serial.send(this.connectionId, str2ab(msg), function() {});
+  
+  serial.send(this.connectionId, bytes, function() {});
 };
 
 SerialConnection.prototype.disconnect = function() {
@@ -99,10 +93,6 @@ connection.onConnect.addListener(function() {
 
 connection.onReadLine.addListener(function(line) {
   console.log('read line: ' + line);
-  // if the line 'TEMPERATURE=' foo is returned, set the
-  // set the button's text
-  if (line.indexOf("TEMPERATURE=")==0)
-    document.querySelector('#get_temperature').innerHTML = "Temp = "+line.substr(12);
 });
 
 // Populate the list of available devices
@@ -132,25 +122,3 @@ document.querySelector('#connect_button').addEventListener('click', function() {
   console.log("Connecting to "+devicePath);
   connection.connect(devicePath);
 });
-
-////////////////////////////////////////////////////////
-
-// Toggle LED state
-var is_on = false;
-document.querySelector('#toggle').addEventListener('click', function() {
-  is_on = !is_on;
-  connection.send("digitalWrite(LED1, "+(is_on ? '1' : '0')+");\n");
-});
-
-// Flash 3 times
-document.querySelector('#flash').addEventListener('click', function() {
-  connection.send("l=0; var interval = setInterval(function() { digitalWrite(LED2, l&1); if (++l>6) clearInterval(interval); }, 200);\n");
-});
-
-// Get temperature
-document.querySelector('#get_temperature').addEventListener('click', function() {
-  connection.send("console.log('TEMPERATURE='+E.getTemperature().toFixed(1));\n");
-});
-
-
-
