@@ -56,7 +56,7 @@ SerialConnection.prototype.getDevices = function(callback) {
 };
 
 SerialConnection.prototype.connect = function(path) {
-  serial.connect(path, this.options, this.onConnectComplete.bind(this))
+  serial.connect(path ? path : this.options.path, this.options, this.onConnectComplete.bind(this))
 };
 
 SerialConnection.prototype.send = function(bytes) {
@@ -75,44 +75,41 @@ SerialConnection.prototype.disconnect = function() {
 
 //function SerialCon
 //var connection = new SerialConnection(SerialOptions);
-
-connection.onConnect.addListener(function() {
-  console.log('connected...');
-  // remove the connection drop-down
-  document.querySelector('#connect_box').style.display = 'none';
-  //document.querySelector('#control_box').style.display = 'block';
-  // Simply send text to Espruino
-  connection.send('"Ready"\n');
-});
-
-connection.onReadLine.addListener(function(line) {
-  console.log('read line: ' + line);
-});
+//
+//connection.onConnect.addListener(function() {
+//  console.log('connected...');
+//  document.querySelector('#connect_box').style.display = 'none';
+//  connection.send('"Ready"\n');
+//});
+//
+//connection.onReadLine.addListener(function(line) {
+//  console.log('read line: ' + line);
+//});
 
 // Populate the list of available devices
-connection.getDevices(function(ports) {
-  // get drop-down port selector
-  var dropDown = document.querySelector('#port_list');
-  // clear existing options
-  dropDown.innerHTML = "";
-  // add new options
-  ports.forEach(function (port) {
-    var displayName = port["displayName"] + "("+port.path+")";
-    if (!displayName) displayName = port.path;
-    
-    var newOption = document.createElement("option");
-    newOption.text = displayName;
-    newOption.value = port.path;
-    dropDown.appendChild(newOption);
-  });
-});
+//connection.getDevices(function(ports) {
+//  // get drop-down port selector
+//  var dropDown = document.querySelector('#port_list');
+//  // clear existing options
+//  dropDown.innerHTML = "";
+//  // add new options
+//  ports.forEach(function (port) {
+//    var displayName = port["displayName"] + "("+port.path+")";
+//    if (!displayName) displayName = port.path;
+//    
+//    var newOption = document.createElement("option");
+//    newOption.text = displayName;
+//    newOption.value = port.path;
+//    dropDown.appendChild(newOption);
+//  });
+//});
 
 // Handle the 'Connect' button
-document.querySelector('#connect_button').addEventListener('click', function() {
-  // get the device to connect to
-  var dropDown = document.querySelector('#port_list');
-  var devicePath = dropDown.options[dropDown.selectedIndex].value;
-  // connect
-  console.log("Connecting to "+devicePath);
-  connection.connect(devicePath);
-});
+//document.querySelector('#connect_button').addEventListener('click', function() {
+//  // get the device to connect to
+//  var dropDown = document.querySelector('#port_list');
+//  var devicePath = dropDown.options[dropDown.selectedIndex].value;
+//  // connect
+//  console.log("Connecting to "+devicePath);
+//  connection.connect(devicePath);
+//});

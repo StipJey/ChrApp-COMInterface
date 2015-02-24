@@ -9,55 +9,66 @@ var nextEvent = {
     DeviceType : null,
     Action : null
 };
-/*function setNextEvent(aDeviceType, anAction){
-    nextEvent.DeviceType = aDeviceType;
-    nextEvent.Action = anAction;
-}
-
-function getNextEvent(){
-    var obj = {};
-    obj.DeviceType = nextEvent.DeviceType;
-    obj.Action = nextEvent.Action;
-    nextEvent.DeviceType = null;
-    nextEvent.Action = null;
-    return obj;
-}*/
 
 webview.addEventListener('contentload', function() {
-    //chrome.app.window.current().fullscreen();
-    console.log('Guest page loaded');
-    SendMsg("Ready?");
-    webview.addEventListener('consolemessage', function(e) {
-        var aMsg;
-        console.log(e.message);
-        if (/apimsg/.test(e.message)){
-            console.log("Я тут");
-            aMsg = JSON.parse(e.message.substr(7));
-            webviewHandler(aMsg);
-            console.log(aMsg);
-        }
-        
+        console.log('Guest page loaded');
+        webview.addEventListener('consolemessage', function(e) {
+            var aMsg;
+            console.log(e.message);
+            if (/apimsg/.test(e.message)){
+                aMsg = JSON.parse(e.message.substr(7));
+                modules[aMsg.DeviceType][aMsg.Action](aMsg.Data);
+                console.log(aMsg);
+            }
+        });
     });
-});
 
-function SendMsg(msg){
+function appMsg(msg){
     webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("FromPage", {detail: "' + msg + '"}))'});
 }
 
-var Module = {};
+function Connection() {
+    this.connection = new SerialConnection(this.serialOptions);
+    
+    this.connect = function() {
+        this.connection.connect(this.options.serialOptions.devicePath);
+    };
+    
+    this.setSerialOptions = function(aOptions) {
+        for (var j in aOptions)
+            this.options.serialOptions[j] = aOptions[j];
+    };
+    
+    this.getOptions = function() {
+        return this.options.serialOptions;
+    };
+    
+    this.getStoredOptions = function() {
+        
+    };
+    
+    this.saveCurrentOptions = function() {
+        
+    };
+}
 
-Module.scales = new Mercury315();
+var modules = {};
 
-function Mercury315() {
-    var SerialOptions = {
-        bitrate : 4800,
-        parityBit : "even",
-        stopBits : "one"
-      };
-      
-    this.connection = new SerialConnection(SerialOptions);
+//Modules.scales = new Mercury315();
+
+function Mercury315(aDevPath) {
+    this.options = {
+            serialOptions : {
+                bitrate : 4800,
+                parityBit : "even",
+                stopBits : "one"
+            },
+            customOptions : ['devicePath']
+            //evtName : 'Mercury315'
+        };
+    
+    Connection.bind(this)();
     this.connection.recieveHandler = this.set_weight;
-    this.evtName = 'Mercury315';
     
     this.set_weight = function(buf){
         var bufView = new Uint8Array(buf);
@@ -65,34 +76,52 @@ function Mercury315() {
         for(var i = 5; i>=0; i--){
             a += bufView[i];
         }
-        SendMsg(parseInt(a));
+        appMsg(parseInt(a));
     };
     this.get_weight = function(){
-        //setNextEvent("scales", "set_weight");
         var bytes = new Uint8Array(1);
         bytes[0] = 3;
         this.connection.send(bytes.buffer);
     };
 }
 
-
-function webviewHandler(aMsg){
-    Module[aMsg.DeviceType][aMsg.Action](aMsg.Data);
+function CommonProcessor() {
+    this.evtName = 'cmn';
+    this.drivers = {
+        scales  :   {
+            display :   'Весы',
+            drivers :   ['Mercury315']
+        }
+    };
+    
+    this.getDrivers = function() {
+        appMsg(this.drivers);
+    };
+    
+    this.getPorts = function() {
+        connection.getDevices(function(ports) {
+            appMsg(ports);
+        });
+    };
+    
+    this.addDevice = function(aDevType, aDevName) {
+        try {
+            var devDrv = null;
+            switch (aDevName) {
+                case 'Mercury315' : {
+                    devDrv = new Mercury315();
+                }
+            }
+            if (devDrv)
+                modules[aDevType] = devDrv;
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    };
 }
 
-
-
-//
-//
-//function CommonProcessor(aModules) {
-//    this.evtName = 'cmn';
-//    this.processAppMessage = function(aData) {
-//
-//        //нужно весы подключить
-//        aModules.newModule(modName);
-//    };
-//}
-//
 //new (function ChromeHandler() {
 //    var modules = {};
 //    var ModulesFunc = getSettings();
