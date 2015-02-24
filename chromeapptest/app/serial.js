@@ -1,11 +1,5 @@
 const serial = chrome.serial;
 
-var SerialOptions = {
-  bitrate : 4800,
-  parityBit : "even",
-  stopBits : "one"
-};
-
 /* Interprets an ArrayBuffer as UTF-8 encoded string data. */
 var parseWeight = function(buf) {
   var bufView = new Uint8Array(buf);
@@ -22,7 +16,8 @@ var parseWeight = function(buf) {
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-var SerialConnection = function() {
+var SerialConnection = function(aOptions) {
+  this.options = aOptions;
   this.connectionId = -1;
   this.lineBuffer = "";
   this.boundOnReceive = this.onReceive.bind(this);
@@ -47,9 +42,7 @@ SerialConnection.prototype.onReceive = function(receiveInfo) {
   if (receiveInfo.connectionId !== this.connectionId) {
     return;
   }
-  var E = getNextEvent();
-  Module[E.DeviceType][E.Action](receiveInfo.data);
-
+  this.recieveHandler(receiveInfo.data);
 };
 
 SerialConnection.prototype.onReceiveError = function(errorInfo) {
@@ -59,11 +52,11 @@ SerialConnection.prototype.onReceiveError = function(errorInfo) {
 };
 
 SerialConnection.prototype.getDevices = function(callback) {
-  serial.getDevices(callback)
+  serial.getDevices(callback);
 };
 
 SerialConnection.prototype.connect = function(path) {
-  serial.connect(path, SerialOptions, this.onConnectComplete.bind(this))
+  serial.connect(path, this.options, this.onConnectComplete.bind(this))
 };
 
 SerialConnection.prototype.send = function(bytes) {
@@ -80,7 +73,8 @@ SerialConnection.prototype.disconnect = function() {
   }
 };
 
-var connection = new SerialConnection();
+//function SerialCon
+//var connection = new SerialConnection(SerialOptions);
 
 connection.onConnect.addListener(function() {
   console.log('connected...');

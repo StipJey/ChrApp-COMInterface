@@ -9,7 +9,7 @@ var nextEvent = {
     DeviceType : null,
     Action : null
 };
-function setNextEvent(aDeviceType, anAction){
+/*function setNextEvent(aDeviceType, anAction){
     nextEvent.DeviceType = aDeviceType;
     nextEvent.Action = anAction;
 }
@@ -21,7 +21,7 @@ function getNextEvent(){
     nextEvent.DeviceType = null;
     nextEvent.Action = null;
     return obj;
-}
+}*/
 
 webview.addEventListener('contentload', function() {
     //chrome.app.window.current().fullscreen();
@@ -49,7 +49,16 @@ var Module = {};
 Module.scales = new Mercury315();
 
 function Mercury315() {
+    var SerialOptions = {
+        bitrate : 4800,
+        parityBit : "even",
+        stopBits : "one"
+      };
+      
+    this.connection = new SerialConnection(SerialOptions);
+    this.connection.recieveHandler = this.set_weight;
     this.evtName = 'Mercury315';
+    
     this.set_weight = function(buf){
         var bufView = new Uint8Array(buf);
         var a = "";
@@ -57,24 +66,17 @@ function Mercury315() {
             a += bufView[i];
         }
         SendMsg(parseInt(a));
-    }
+    };
     this.get_weight = function(){
-        setNextEvent("scales", "set_weight");
+        //setNextEvent("scales", "set_weight");
         var bytes = new Uint8Array(1);
         bytes[0] = 3;
-        connection.send(bytes.buffer);
-    }
+        this.connection.send(bytes.buffer);
+    };
 }
 
 
 function webviewHandler(aMsg){
-//    switch (aMsg.wvEvent){
-//        case "ReadyState" : console.log(aMsg.wvData); break;
-//        case "Test" : console.log(aMsg.wvData); break;
-//        case "Print" : console.log(aMsg.wvData); break;
-//        case "ToCOM" : connection.send(aMsg.wvData.count); break;
-//        default: console.log("Неизвестное событие"); break;
-//    }
     Module[aMsg.DeviceType][aMsg.Action](aMsg.Data);
 }
 

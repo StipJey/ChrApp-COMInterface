@@ -6,7 +6,7 @@
   </context-param>
   <context-param>
     <param-name>url</param-name>
-    <param-value>file:/C:/Users/Work/Documents/NetBeansProjects/chromeapptest/</param-value>
+    <param-value>file:/C:/chromeAppSupportAPI/chromeapptest/</param-value>
   </context-param>
   <listener>
     <listener-class>com.eas.server.httpservlet.PlatypusSessionsSynchronizer</listener-class>
@@ -16,7 +16,7 @@
     <servlet-class>com.eas.server.httpservlet.PlatypusHttpServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
     <multipart-config>
-      <location>C:/Users/Work/Documents/NetBeansProjects/chromeapptest/web/pub</location>
+      <location>C:/chromeAppSupportAPI/chromeapptest/web/pub</location>
       <max-file-size>2097152</max-file-size>
       <max-request-size>2165824</max-request-size>
       <file-size-threshold>1048576</file-size-threshold>
