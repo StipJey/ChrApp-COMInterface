@@ -127,9 +127,28 @@ function CommonProcessor() {
 }
 
 var cmn = new CommonProcessor();
-document.querySelector('#connect_button').addEventListener('click', function() {
+document.querySelector('#check_button').addEventListener('click', function() {
     cmn.addDevice("scales", "Mercury315");
+    chrome.storage.local.get(['scale_port'], function(data) {
+        if (data.scale_port) {
+            console.log("Port: ", data.scale_port);
+            modules.scales.setSerialOptions({devicePath : data.scale_port});
+        } else {
+            modules.scales.getPorts();
+            console.log("choose port");
+        }
+    });
     //modules.scales.getPorts();
+});
+
+document.querySelector('#connect_button').addEventListener('click', function() {
+    if (!modules.scales.getOptions().devicePath){
+        var dropDown = document.querySelector('#port_list');
+        var devicePath = dropDown.options[dropDown.selectedIndex].value;
+        chrome.storage.local.set({scale_port : devicePath});
+        modules.scales.setSerialOptions({devicePath : devicePath});
+    }
+    modules.scales.connect();
 });
 
 //new (function ChromeHandler() {
