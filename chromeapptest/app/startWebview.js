@@ -28,19 +28,19 @@ function appMsg(msg){
 }
 
 function Connection() {
-    this.connection = new SerialConnection(this.serialOptions);
+    this.connection = new SerialConnection(this.options.serialOptions);
     
     this.connect = function() {
-        this.connection.connect(this.options.serialOptions.devicePath);
+        this.connection.connect(this.options.devicePath);
     };
     
     this.setSerialOptions = function(aOptions) {
         for (var j in aOptions)
-            this.options.serialOptions[j] = aOptions[j];
+            this.options[j] = aOptions[j];
     };
     
     this.getOptions = function() {
-        return this.options.serialOptions;
+        return this.options;
     };
     
     this.getStoredOptions = function() {
@@ -50,11 +50,22 @@ function Connection() {
     this.saveCurrentOptions = function() {
         
     };
+    
+    this.getPorts = function() {
+        this.connection.getDevices(function(ports) {
+            var dropDown = document.querySelector('#port_list');
+            dropDown.innerHTML = "";
+            ports.forEach(function (port) {
+                var newOption = document.createElement("option");
+                newOption.text = port.path;
+                newOption.value = port.path;
+                dropDown.appendChild(newOption);
+            });
+        });
+    };
 }
 
 var modules = {};
-
-//Modules.scales = new Mercury315();
 
 function Mercury315(aDevPath) {
     this.options = {
@@ -62,13 +73,11 @@ function Mercury315(aDevPath) {
                 bitrate : 4800,
                 parityBit : "even",
                 stopBits : "one"
-            },
-            customOptions : ['devicePath']
-            //evtName : 'Mercury315'
+            }
         };
     
     Connection.bind(this)();
-    this.connection.recieveHandler = this.set_weight;
+    
     
     this.set_weight = function(buf){
         var bufView = new Uint8Array(buf);
@@ -83,6 +92,7 @@ function Mercury315(aDevPath) {
         bytes[0] = 3;
         this.connection.send(bytes.buffer);
     };
+    this.connection.recieveHandler = this.set_weight;
 }
 
 function CommonProcessor() {
@@ -96,12 +106,6 @@ function CommonProcessor() {
     
     this.getDrivers = function() {
         appMsg(this.drivers);
-    };
-    
-    this.getPorts = function() {
-        connection.getDevices(function(ports) {
-            appMsg(ports);
-        });
     };
     
     this.addDevice = function(aDevType, aDevName) {
@@ -121,6 +125,12 @@ function CommonProcessor() {
         }
     };
 }
+
+var cmn = new CommonProcessor();
+document.querySelector('#connect_button').addEventListener('click', function() {
+    cmn.addDevice("scales", "Mercury315");
+    //modules.scales.getPorts();
+});
 
 //new (function ChromeHandler() {
 //    var modules = {};

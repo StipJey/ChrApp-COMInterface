@@ -1,21 +1,5 @@
 const serial = chrome.serial;
 
-/* Interprets an ArrayBuffer as UTF-8 encoded string data. */
-var parseWeight = function(buf) {
-  var bufView = new Uint8Array(buf);
-  var a = "";
-  for(var i = 5; i>=0; i--){
-      a += bufView[i];
-  }
-  return parseInt(a);
-};
-
-/* Converts a string to UTF-8 encoding in a Uint8Array; returns the array buffer. */
-
-
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
-
 var SerialConnection = function(aOptions) {
   this.options = aOptions;
   this.connectionId = -1;
