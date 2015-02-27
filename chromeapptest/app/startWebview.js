@@ -136,7 +136,8 @@ document.querySelector('#check_button').addEventListener('click', function() {
         } else {
             modules.scales.getPorts();
             console.log("choose port");
-        }
+        }    //modules.scales.getPorts();
+
     });
     //modules.scales.getPorts();
 });
@@ -149,6 +150,8 @@ document.querySelector('#connect_button').addEventListener('click', function() {
         modules.scales.setSerialOptions({devicePath : devicePath});
     }
     modules.scales.connect();
+    webview.style.top = '0px';
+    
 });
 
 //new (function ChromeHandler() {
