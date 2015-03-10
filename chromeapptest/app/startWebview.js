@@ -78,8 +78,7 @@ function Mercury315(aDevPath) {
             serialOptions : {
                 bitrate : 4800,
                 parityBit : "even",
-                stopBits : "one",
-                ctsFlowControl : true
+                stopBits : "one"
             }
         };
     
