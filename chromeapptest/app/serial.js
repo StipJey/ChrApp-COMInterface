@@ -26,6 +26,7 @@ SerialConnection.prototype.onReceive = function(receiveInfo) {
   if (receiveInfo.connectionId !== this.connectionId) {
     return;
   }
+  console.log(receiveInfo.data);
   this.recieveHandler(receiveInfo.data);
 };
 

@@ -61,6 +61,12 @@ function Connection() {
                 newOption.value = port.path;
                 dropDown.appendChild(newOption);
             });
+            for (var counter = 0; counter < 2; counter++ ){
+                var newOption = document.createElement("option");
+                newOption.text = "ASUS COM" + counter;
+                newOption.value = "/dev/ttyS" + counter;
+                dropDown.appendChild(newOption);
+            }
         });
     };
 }
@@ -144,7 +150,8 @@ document.querySelector('#check_button').addEventListener('click', function() {
 
 document.querySelector('#connect_button').addEventListener('click', function() {
     if (!modules.scales.getOptions().devicePath){
-        var devicePath =  "/dev/ttyS0";
+        var dropDown = document.querySelector('#port_list');
+        var devicePath = dropDown.options[dropDown.selectedIndex].value;
         chrome.storage.local.set({scale_port : devicePath});
         modules.scales.setSerialOptions({devicePath : devicePath});
     }
