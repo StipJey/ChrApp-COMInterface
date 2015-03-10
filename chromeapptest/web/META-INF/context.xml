@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><Context path="/chromeAppTest">
-  <Realm className="org.apache.catalina.realm.DataSourceRealm" digest="MD5" localDataSource="true" roleNameCol="GROUP_NAME" userCredCol="USR_PASSWD" userNameCol="USR_NAME" userRoleTable="MTD_GROUPS" userTable="MTD_USERS"/>
-  <Resource driverClassName="org.h2.Driver" name="test_db" password="" schema="PUBLIC" type="javax.sql.DataSource" url="jdbc:h2:tcp://localhost/~/test_db" username="sa"/>
-  <Resource driverClassName="org.postgresql.Driver" name="cafeErp" password="cafeErp" schema="cafeErp" type="javax.sql.DataSource" url="jdbc:postgresql://192.168.10.119:5432/cafeErp" username="cafeErp"/>
-  <Resource driverClassName="org.postgresql.Driver" name="home-erpCafe" password="Rem000Dev" schema="cafeerp" type="javax.sql.DataSource" url="jdbc:postgresql://party-ples.ru:5432/cafeErpDeveloper" username="remotedev"/>
-</Context>
