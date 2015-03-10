@@ -1,4 +1,6 @@
 const serial = chrome.serial;
+var bufferSize = 0;
+var bufferLine;
 
 var SerialConnection = function(aOptions) {
   this.options = aOptions;
@@ -26,7 +28,7 @@ SerialConnection.prototype.onReceive = function(receiveInfo) {
   if (receiveInfo.connectionId !== this.connectionId) {
     return;
   }
-  console.log(receiveInfo);
+  //console.log(receiveInfo);
   this.recieveHandler(receiveInfo.data);
 };
 
