@@ -144,14 +144,17 @@ document.querySelector('#check_button').addEventListener('click', function() {
 
 document.querySelector('#connect_button').addEventListener('click', function() {
     if (!modules.scales.getOptions().devicePath){
-        var dropDown = document.querySelector('#port_list');
-        var devicePath = dropDown.options[dropDown.selectedIndex].value;
+        var devicePath =  "/dev/ttyS0";
         chrome.storage.local.set({scale_port : devicePath});
         modules.scales.setSerialOptions({devicePath : devicePath});
     }
     modules.scales.connect();
     webview.style.top = '0px';
     
+});
+
+document.querySelector('#reset_button').addEventListener('click', function() {
+        chrome.storage.local.remove("scale_port");
 });
 
 //new (function ChromeHandler() {
