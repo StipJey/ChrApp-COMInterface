@@ -84,15 +84,15 @@ function Mercury315(aDevPath) {
     
     Connection.bind(this)();
     
-    this.current_buffer = [];
+    var current_buffer = [];
     
     this.rHandler = function(buf){
         var bufView = new Uint8Array(buf);
-        for (var i=0; i<bufView.length && this.current_buffer.length < 18; i++){
-            this.current_buffer[this.current_buffer.length] = bufView[i];
+        for (var i=0; i<bufView.length && current_buffer.length < 18; i++){
+            current_buffer[current_buffer.length] = bufView[i];
         }
-        if (this.current_buffer.length == 18)
-            this.set_weight(this.current_buffer);
+        if (current_buffer.length == 18)
+            this.set_weight(current_buffer);
     }
     this.set_weight = function(bufView){
         var a = "";
@@ -104,7 +104,7 @@ function Mercury315(aDevPath) {
     this.get_weight = function(){
         var bytes = new Uint8Array(1);
         bytes[0] = 3;
-        this.current_buffer = [];
+        current_buffer = [];
         this.connection.send(bytes.buffer);
     };
     this.connection.recieveHandler = this.rHandler;
