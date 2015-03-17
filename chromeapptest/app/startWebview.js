@@ -94,7 +94,7 @@ function Mercury315(aDevPath) {
     }
     this.set_weight = function(bufView){
         var a = "";
-        for(var i = 5; i>=0; i--){
+        for(var i = 17; i>=11; i--){
             a += bufView[i];
         }
         appMsg(parseInt(a));
