@@ -90,7 +90,7 @@ function Mercury315(aDevPath) {
             current_buffer[current_buffer.length] = bufView[i];
         }
         if (current_buffer.length == 18)
-            this.set_weight(current_buffer);
+            modules["scales"]["set_weight"](current_buffer);
     }
     this.set_weight = function(bufView){
         var a = "";
