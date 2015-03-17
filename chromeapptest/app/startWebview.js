@@ -82,8 +82,6 @@ function Mercury315(aDevPath) {
             }
         };
     
-    Connection.bind(this)();
-    
     var current_buffer = [];
     
     this.rHandler = function(buf){
@@ -108,6 +106,7 @@ function Mercury315(aDevPath) {
         this.connection.send(bytes.buffer);
     };
     this.connection.recieveHandler = this.rHandler;
+    Connection.bind(this)();
 }
 
 function CommonProcessor() {
