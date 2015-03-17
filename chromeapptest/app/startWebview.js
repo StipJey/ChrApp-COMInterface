@@ -105,8 +105,9 @@ function Mercury315(aDevPath) {
         current_buffer = [];
         this.connection.send(bytes.buffer);
     };
-    this.connection.recieveHandler = this.rHandler;
     Connection.bind(this)();
+    this.connection.recieveHandler = this.rHandler;
+    
 }
 
 function CommonProcessor() {
