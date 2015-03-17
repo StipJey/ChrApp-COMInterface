@@ -23,8 +23,11 @@ webview.addEventListener('contentload', function() {
         });
     });
 
-function appMsg(msg){
-    webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("FromPage", {detail: "' + msg + '"}))'});
+function appMsg(msg, evtName){
+    if (evtName){
+        webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("' + evtName +'", {detail: "' + msg + '"}))'});
+    } else
+        webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("FromPage", {detail: "' + msg + '"}))'});
 }
 
 function Connection() {
@@ -49,6 +52,15 @@ function Connection() {
     
     this.saveCurrentOptions = function() {
         
+    };
+    
+    this.getPortList = function(){
+        this.connection.getDevices(function(ports) {
+            for (var counter = 0; counter < 2; counter++ ){
+                ports.push({path : "/dev/ttyS" + counter});
+            }
+            return ports;
+        });
     };
     
     this.getPorts = function() {
@@ -120,7 +132,7 @@ function CommonProcessor() {
     };
     
     this.getDrivers = function() {
-        appMsg(this.drivers);
+        appMsg(JSON.stringify(this.drivers));
     };
     
     this.addDevice = function(aDevType, aDevName) {
@@ -141,7 +153,50 @@ function CommonProcessor() {
     };
 }
 
+function Settings(){
+    this.setSettings = function(aSettings){
+        chrome.storage.local.set(aSettings);
+    };
+    this.getSettings = function(){
+        chrome.storage.local.get(function(data){
+            appMsg(JSON.stringify(data));
+        })
+    };
+    this.getDevices = function(){
+        var devices = {
+            scales      :   {
+                display : "Весы",
+                values  : [{
+                        name : "none"
+                    }, {
+                    name     :   "Mercury315",
+                    settings :  {
+                        port    :   {
+                            display :   "Порт",
+                            values  :   modules.scales.getPortList()
+                        }
+                    },
+                    actions : [
+                        {
+                            display :   "Получить вес",
+                            command :   "get_weight"
+                        }
+                    ]
+                }]
+            }
+        }
+        appMsg(JSON.stringify(devices), "setSetting");
+    }
+    
+    Connection.bind(this)();
+}
+
 var cmn = new CommonProcessor();
+
+chrome.app.runtime.onLaunched.addListener(function() {
+    cmn.addDevice("main", "Settings");
+})
+
 document.querySelector('#check_button').addEventListener('click', function() {
     cmn.addDevice("scales", "Mercury315");
     chrome.storage.local.get(['scale_port'], function(data) {
