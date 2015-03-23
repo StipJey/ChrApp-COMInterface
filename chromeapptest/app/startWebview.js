@@ -30,6 +30,7 @@ webview.addEventListener('contentload', function() {
             }
             modules.scales.connect();
             webview.style.top = '0px';*/
+            document.getElementById('check_button').click();
             document.getElementById('connect_button').click();
         } catch(e) {
             console.log('Cannot initialize devices! Error: ' + e);
