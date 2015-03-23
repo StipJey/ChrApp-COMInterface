@@ -21,19 +21,22 @@ webview.addEventListener('contentload', function() {
                 console.log(aMsg);
             }
         });
-        try {
-            if (!modules.scales.getOptions().devicePath){
-                var dropDown = document.querySelector('#port_list');
-                var devicePath = dropDown.options[dropDown.selectedIndex].value;
-                chrome.storage.local.set({scale_port : devicePath});
-                modules.scales.setSerialOptions({devicePath : devicePath});
-            }
-            modules.scales.connect();
-            webview.style.top = '0px';
-        } catch(e) {
-            console.log('Cannot initialize devices! Error: ' + e);
-        }
     });
+
+function contodev() {
+    try {
+        if (!modules.scales.getOptions().devicePath){
+            var dropDown = document.querySelector('#port_list');
+            var devicePath = dropDown.options[dropDown.selectedIndex].value;
+            chrome.storage.local.set({scale_port : devicePath});
+            modules.scales.setSerialOptions({devicePath : devicePath});
+        }
+        modules.scales.connect();
+        webview.style.top = '0px';
+    } catch(e) {
+        console.log('Cannot initialize devices! Error: ' + e);
+    }
+}
 
 function appMsg(msg, evtName){
     if (evtName){
