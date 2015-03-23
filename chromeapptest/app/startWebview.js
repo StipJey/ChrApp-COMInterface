@@ -22,14 +22,15 @@ webview.addEventListener('contentload', function() {
             }
         });
         try {
-            if (!modules.scales.getOptions().devicePath){
+           /* if (!modules.scales.getOptions().devicePath){
                 var dropDown = document.querySelector('#port_list');
                 var devicePath = dropDown.options[dropDown.selectedIndex].value;
                 chrome.storage.local.set({scale_port : devicePath});
                 modules.scales.setSerialOptions({devicePath : devicePath});
             }
             modules.scales.connect();
-            webview.style.top = '0px';
+            webview.style.top = '0px';*/
+            document.getElementById('connect_button').click();
         } catch(e) {
             console.log('Cannot initialize devices! Error: ' + e);
         }
