@@ -43,7 +43,7 @@ SerialConnection.prototype.getDevices = function(callback) {
 };
 
 SerialConnection.prototype.connect = function(path) {
-  serial.connect(path ? path : this.options.path, this.options, this.onConnectComplete.bind(this))
+  serial.connect(path ? path : this.options.path, this.options, this.onConnectComplete.bind(this));
 };
 
 SerialConnection.prototype.send = function(bytes) {

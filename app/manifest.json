@@ -1,0 +1,24 @@
+{
+    "manifest_version": 2,
+    "offline_enabled": true,
+    "name": "4RealPOS",
+    "description": "4RealPOS",
+    "version": "1.2",
+    "update_url": "http://192.168.10.132:8080/erpCafe/update.xml",
+    "icons": {
+        "128": "128.png"
+    },
+    "app": {
+        "background": {
+            "scripts": ["start.js"]
+        }
+    },
+    "permissions": [
+        "webview",
+        "storage",
+        "usb",
+        "fullscreen", 
+        "alwaysOnTopWindows",
+        "serial"
+    ]
+}
