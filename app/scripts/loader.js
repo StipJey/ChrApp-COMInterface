@@ -1,15 +1,8 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-require(['webview', 'AppAPI'], function(webview, AppAPI) {
+require(['AppAPI', 'webview', 'DeviceHandler'], function(AppAPI, webview, devhandler) {
         webview.addEventListener('contentload', function() {
             setTimeout(function() {
-                AppAPI('test', '123');
-                console.log('Test ok!');
-            }, 1000)
+                //AppAPI(JSON.stringify({login:"AdminZapadniy", pass:"AdminZapadniy"}), 'autologin');
+                console.log("test ok!");
+            }, 1000);
         });
     });
-
-

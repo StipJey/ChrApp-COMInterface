@@ -1,9 +1,4 @@
-/**
- * 
- * @author Alexey
- * @module
- */
-define('AppAPI', ['webview'], function (webview) {
+define(['webview'], function (webview) {
     var self = this, model = this.model;
     
     webview.addEventListener('consolemessage', function(e) {
@@ -11,15 +6,19 @@ define('AppAPI', ['webview'], function (webview) {
         console.log(e.message);
         if (/apimsg/.test(e.message)){
             aMsg = JSON.parse(e.message.substr(7));
-            modules[aMsg.DeviceType][aMsg.Action](aMsg.Data);
-            console.log(aMsg);
+            var evt = new CustomEvent(aMsg.evtDest, aMsg.data);
+            document.dispatchEvent(evt);
         }
     });
-    
-    return function(msg, evtName){
+
+    function dispatchWebviewEvent(msg, evtName){
         if (evtName){
-            webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("' + evtName +'", {detail: "' + msg + '"}))'});
+            console.log(msg);
+            webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("' + evtName +'", {detail: ' + msg + '}))'});
         } else
-            webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("FromPage", {detail: "' + msg + '"}))'});
+            console.log(msg);
+            webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("Error", {detail: "' + msg + '"}))'});
     }
+    
+    return dispatchWebviewEvent;
 });
