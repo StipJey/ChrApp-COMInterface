@@ -1,3 +1,4 @@
+define(function(){
 const serial = chrome.serial;
 var bufferSize = 0;
 var bufferLine;
@@ -59,3 +60,6 @@ SerialConnection.prototype.disconnect = function() {
     throw 'Invalid connection';
   }
 };
+
+return SerialConnection;
+});
