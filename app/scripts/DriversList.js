@@ -6,7 +6,7 @@ define(function(){
             drivers : {
                 mercury315 : {
                     name :"Mercury 315",
-                    file :"Mercury315" 
+                    file :"Mercury315"
                 }
             }
         },

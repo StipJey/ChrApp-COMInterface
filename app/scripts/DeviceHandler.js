@@ -14,4 +14,4 @@ define(['settings', 'AppAPI'], function(settings, AppAPI){
     
     settings.getSettings('scale', scaleCallback);
 
-})
+});

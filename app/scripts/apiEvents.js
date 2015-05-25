@@ -16,5 +16,11 @@ define(function(require){
         AppAPI(obj, 'getDevices');
     });
     
+    document.addEventListener('connectTo', function(aData){
+        var deviceData = aData.detail;
+        var device = require(deviceData.file);
+        device.connect(deviceData.port);
+    });
+    
     return this;
 });

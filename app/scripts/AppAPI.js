@@ -6,7 +6,7 @@ define(['webview'], function (webview) {
         console.log(e.message);
         if (/apimsg/.test(e.message)){
             aMsg = JSON.parse(e.message.substr(7));
-            var evt = new CustomEvent(aMsg.evtDest, aMsg.data);
+            var evt = new CustomEvent(aMsg.evtDest, {detail : aMsg.data});
             document.dispatchEvent(evt);
         }
     });
