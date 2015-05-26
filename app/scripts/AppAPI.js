@@ -12,12 +12,16 @@ define(['webview'], function (webview) {
     });
 
     function dispatchWebviewEvent(msg, evtName){
+        if (typeof (msg) != 'string'){
+            msg = JSON.stringify(msg);
+        }
         if (evtName){
             console.log(msg);
             webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("' + evtName +'", {detail: ' + msg + '}))'});
-        } else
+        } else {
             console.log(msg);
-            webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("Error", {detail: "' + msg + '"}))'});
+            webview.executeScript({code: 'window.dispatchEvent(new CustomEvent("Error", {detail: "' + msg + '"}))'});
+        }
     }
     
     return dispatchWebviewEvent;

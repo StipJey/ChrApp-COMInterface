@@ -30,23 +30,25 @@ define('Connection', ['../libs/SerialConnection'], function (SerialConnection) {
             return ports;
         });
     };
+
+    return this;
     
-    this.getPorts = function() {
-        this.connection.getDevices(function(ports) {
-            var dropDown = document.querySelector('#port_list');
-            dropDown.innerHTML = "";
-            ports.forEach(function (port) {
-                var newOption = document.createElement("option");
-                newOption.text = port.path;
-                newOption.value = port.path;
-                dropDown.appendChild(newOption);
-            });
-            for (var counter = 0; counter < 2; counter++ ){
-                var newOption = document.createElement("option");
-                newOption.text = "ASUS COM" + counter;
-                newOption.value = "/dev/ttyS" + counter;
-                dropDown.appendChild(newOption);
-            }
-        });
-    };
+    //this.getPorts = function() {
+    //    this.connection.getDevices(function(ports) {
+    //        var dropDown = document.querySelector('#port_list');
+    //        dropDown.innerHTML = "";
+    //        ports.forEach(function (port) {
+    //            var newOption = document.createElement("option");
+    //            newOption.text = port.path;
+    //            newOption.value = port.path;
+    //            dropDown.appendChild(newOption);
+    //        });
+    //        for (var counter = 0; counter < 2; counter++ ){
+    //            var newOption = document.createElement("option");
+    //            newOption.text = "ASUS COM" + counter;
+    //            newOption.value = "/dev/ttyS" + counter;
+    //            dropDown.appendChild(newOption);
+    //        }
+    //    });
+    //};
 });

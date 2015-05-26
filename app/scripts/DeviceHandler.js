@@ -1,5 +1,12 @@
 define(['settings', 'AppAPI'], function(settings, AppAPI){
-    
+    //var driversList = require('DriversList');
+    //var driversReq = {};
+    //for (type of driversList){
+    //    driversReq[type.type] = {};
+    //    for (driver of type.drivers){
+    //        driversReq[type.type][driver.file] = require(driver.file);
+    //    }
+    //}
     function scaleCallback(aData) {
         require(aData, function(scale){
             if (scale){
@@ -11,7 +18,16 @@ define(['settings', 'AppAPI'], function(settings, AppAPI){
             }
         })
     };
+
+    function DeviceHandler(){
+        this.devices = {};
+        this.add = function(aDevice, anAlias){
+            this.devices[anAlias] = new aDevice();
+        }
+    }
     
     settings.getSettings('scale', scaleCallback);
+
+    return DeviceHandler;
 
 });
