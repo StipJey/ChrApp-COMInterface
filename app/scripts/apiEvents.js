@@ -8,16 +8,16 @@ define(function(require){
     });
 
     document.addEventListener('getDevices', function(){
-        var obj = {};
+        var devices = require('DriversList');
+        AppAPI(devices, 'getDevices');
+    });
+
+    document.addEventListener('getPorts', function(){
         var Connection = require('../libs/SerialConnection');
         var connection = new Connection();
-
-        obj.devices = require('DriversList');
         connection.getDevices(function(ports) {
-            obj.ports = ports;
-            AppAPI(obj, 'getDevices');
+            AppAPI(ports, 'getDevices');
         });
-
     });
 
     document.addEventListener('connectTo', function(event){
