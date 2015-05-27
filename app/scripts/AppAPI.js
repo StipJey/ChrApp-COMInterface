@@ -16,10 +16,10 @@ define(['webview'], function (webview) {
             msg = JSON.stringify(msg);
         }
         if (evtName){
-            console.log(msg);
+            console.log('window.dispatchEvent(new CustomEvent("' + evtName +'", {detail: ' + msg + '}))');
             webview.executeScript({code : 'window.dispatchEvent(new CustomEvent("' + evtName +'", {detail: ' + msg + '}))'});
         } else {
-            console.log(msg);
+            console.log('window.dispatchEvent(new CustomEvent("Error", {detail: "' + msg + '"}))');
             webview.executeScript({code: 'window.dispatchEvent(new CustomEvent("Error", {detail: "' + msg + '"}))'});
         }
     }

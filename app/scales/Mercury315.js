@@ -21,16 +21,16 @@ define(function(require){
                 current_buffer[current_buffer.length] = bufView[i];
             }
             if (current_buffer.length == 18)
-                modules["scales"]["set_weight"](current_buffer);
+                sendWeight(current_buffer);
         };
 
-        this.set_weight = function (bufView) {
+        function sendWeight(bufView){
             var a = "";
             for (var i = 5; i >= 0; i--) {
                 a += bufView[i];
             }
             AppAPI(parseInt(a), 'setWeight');
-        };
+        }
 
         this.get_weight = function () {
             var bytes = new Uint8Array(1);

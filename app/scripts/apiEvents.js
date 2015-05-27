@@ -15,8 +15,9 @@ define(function(require){
         obj.devices = require('DriversList');
         connection.getDevices(function(ports) {
             obj.ports = ports;
+            AppAPI(obj, 'getDevices');
         });
-        AppAPI(obj, 'getDevices');
+
     });
 
     document.addEventListener('connectTo', function(event){
@@ -26,6 +27,11 @@ define(function(require){
             deviceHandler.devices[deviceData.alias].connect(deviceData.port);
         })
 
+    });
+
+    document.addEventListener('isConnect', function(event){
+        var deviceData = event.detail;
+        AppAPI(deviceHandler.devices[deviceData.alias]['connection']['connectionId'], 'isConnect');
     });
 
     document.addEventListener('setSettings', function(event){
