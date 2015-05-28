@@ -1,5 +1,5 @@
 define(function(require){
-    var Connection = require('../libs/SerialConnection');
+    var SerialConnection = require('../libs/SerialConnection');
     var AppAPI = require('AppAPI');
 
     function Mercury315() {
@@ -8,14 +8,14 @@ define(function(require){
         this.options = {
             //serialOptions: {
             //    bitrate: 4800,
-            //    parityBit: "even"
-            //    //stopBits: "one"
+            //    parityBit: "even",
+            //    stopBits: "one"
             //}
         };
 
         var current_buffer = [];
 
-        this.rHandler = function (buf) {
+        function rHandler (buf) {
             var bufView = new Uint8Array(buf);
             for (var i = 0; i < bufView.length && current_buffer.length < 18; i++) {
                 current_buffer[current_buffer.length] = bufView[i];
@@ -39,9 +39,9 @@ define(function(require){
             this.connection.send(bytes.buffer);
         };
 
-        this.connection = new Connection(this.options);
+        this.connection = new SerialConnection(this.options);
 
-        this.connection.recieveHandler = this.rHandler;
+        this.connection.recieveHandler = rHandler;
 
         this.connect = function(aPath) {
             if (aPath){

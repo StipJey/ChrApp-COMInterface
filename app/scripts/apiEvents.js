@@ -29,9 +29,23 @@ define(function(require){
 
     });
 
-    document.addEventListener('isConnect', function(event){
+    document.addEventListener('isConnected', function(event){
         var deviceData = event.detail;
         AppAPI(deviceHandler.devices[deviceData.alias]['connection']['connectionId'], 'isConnect');
+    });
+
+    document.addEventListener('getFunctions', function(event){
+        var deviceData = event.detail;
+        var output = [];
+        for (func in deviceHandler.devices[deviceData.alias]){
+            output.push(func);
+        }
+        AppAPI(output, 'getFunctions');
+    });
+
+    document.addEventListener('go', function(event){
+        var deviceData = event.detail;
+        deviceHandler.devices[deviceData.alias][deviceData.method](deviceData.params);
     });
 
     document.addEventListener('setSettings', function(event){
