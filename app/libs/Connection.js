@@ -1,37 +1,40 @@
 define('Connection', ['../libs/SerialConnection'], function (SerialConnection) {
-    this.connection = new SerialConnection(this.options.serialOptions);
-    
-    this.connect = function() {
-        this.connection.connect(this.options.devicePath);
-    };
-    
-    this.setSerialOptions = function(aOptions) {
-        for (var j in aOptions)
-            this.options[j] = aOptions[j];
-    };
-    
-    this.getOptions = function() {
-        return this.options;
-    };
-    
-    this.getStoredOptions = function() {
-        
-    };
-    
-    this.saveCurrentOptions = function() {
-        
-    };
-    
-    this.getPortList = function(){
-        this.connection.getDevices(function(ports) {
-            for (var counter = 0; counter < 2; counter++ ){
-                ports.push({path : "/dev/ttyS" + counter});
-            }
-            return ports;
-        });
-    };
 
-    return this;
+    function Connection(){
+        this.connection = new SerialConnection(this.options.serialOptions);
+
+        this.connect = function() {
+            this.connection.connect(this.options.devicePath);
+        };
+
+        this.setSerialOptions = function(aOptions) {
+            for (var j in aOptions)
+                this.options[j] = aOptions[j];
+        };
+
+        this.getOptions = function() {
+            return this.options;
+        };
+
+        this.getStoredOptions = function() {
+
+        };
+
+        this.saveCurrentOptions = function() {
+
+        };
+
+        this.getPortList = function(){
+            this.connection.getDevices(function(ports) {
+                for (var counter = 0; counter < 2; counter++ ){
+                    ports.push({path : "/dev/ttyS" + counter});
+                }
+                return ports;
+            });
+        };
+    }
+
+    return new Connection();
     
     //this.getPorts = function() {
     //    this.connection.getDevices(function(ports) {

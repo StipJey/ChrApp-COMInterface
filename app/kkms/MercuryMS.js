@@ -4,9 +4,15 @@
 define(function(require){
     var SerialConnection = require('../libs/SerialConnection');
     var AppAPI = require('AppAPI');
-    var Utils = require('../libs/MercuryMS_Utils');
+    var Utils = require('../libs/MercuryMS/MercuryMS_Utils');
+    var errors = require('../libs/MercuryMS/MercuryMS_Errors')
 
     function MercuryMS(){
+        var stx = 2;
+        var etx = 3;
+        var passwordData = [48,48,48,48];
+        var password = "0000";
+        
         this.options = {
             bufferSize: 4096,
             bitrate: 9600,
@@ -14,19 +20,32 @@ define(function(require){
             parityBit: "no",
             stopBits: "one"
         };
-        this.connection = new SerialConnection(this.options);
+        var serial = new SerialConnection(this.options);
 
 
-        self.registerCashier = function (aNumber, aFamily, aCallback) { //открытие смены
+        this.getPassword = function () {
+            return password;
+        };
+
+        this.setPassword = function (aValue) {
+            if (aValue.length == 4) {
+                password = aValue;
+                passwordData = Utils.stringToBytes(password);
+            //TO DO call KKM
+            }
+            throw "Пароль должен содержать 4 символа.";
+        };
+
+        this.openSession = function (aNumber, aFamily, aCallback) { //открытие смены
             if (aNumber < 100 && aNumber > -1) {
                 if (aFamily && aFamily.length > 0 && aFamily.length < 41) {
                     var data = [];
                     data.push(49);
                     data = data.concat(passwordData);
                     data.push(0);
-                    data = data.concat(utils.completeData(utils.stringToBytes(aNumber.toString()), 2));
+                    data = data.concat(Utils.completeData(Utils.stringToBytes(aNumber.toString()), 2));
                     data.push(0);
-                    data = data.concat(utils.completeData(utils.stringToBytes(aFamily), 40));
+                    data = data.concat(Utils.completeData(Utils.stringToBytes(aFamily), 40));
                     data.push(0);
                     data = Utils.prepare(data);
                     Utils.print(data);
@@ -51,7 +70,7 @@ define(function(require){
             if (aData && aData.length > 0) {
                 if (aData[0] == stx && aData[aData.length - 1] == etx) {
                     if (aData[1] == aMessageType) {
-                        if (utils.checkBCC(aData)) {
+                        if (Utils.checkBCC(aData)) {
                             return "";
                         } else {
                             return "Неверная контрольная сумма в ответе.";
@@ -71,14 +90,14 @@ define(function(require){
             var error = checkResponse(aData, 49)
             var result = {};
             if (!error) {
-                var resultCode = utils.getInt(aData, 7, 4);
+                var resultCode = Utils.getInt(aData, 7, 4);
                 if (!resultCode) {
                     result.error = errors.getErrorDescription(resultCode);
                 } else {
                     result.code = resultCode;
                     result.message = errors.getErrorDescription(resultCode);
-                    result.kkmStatus = utils.getInt(aData, 2, 4);
-                    result.printerStatus = utils.getInt(aData, 12, 2);
+                    result.kkmStatus = Utils.getInt(aData, 2, 4);
+                    result.printerStatus = Utils.getInt(aData, 12, 2);
                 }
             } else {
                 result.error = error;
@@ -111,9 +130,9 @@ define(function(require){
                     data.push(0);
                     data.push(aType);
                     data.push(0);
-                    data = data.concat(utils.stringToBytes(aFlags.getByte().toString(16).toUpperCase()));
+                    data = data.concat(Utils.stringToBytes(aFlags.getByte().toString(16).toUpperCase()));
                     data.push(0);
-                    data = data.concat(utils.completeData(utils.stringToBytes(aCashier.toString()), 2));
+                    data = data.concat(Utils.completeData(Utils.stringToBytes(aCashier.toString()), 2));
                     data.push(0);
                     data = prepare(data);
                     Utils.print(data);
@@ -138,17 +157,17 @@ define(function(require){
             var error = checkResponse(aData, 95)
             var result = {};
             if (!error) {
-                var resultCode = utils.getInt(aData, 7, 4);
+                var resultCode = Utils.getInt(aData, 7, 4);
                 if (!resultCode) {
                     result.error = errors.getErrorDescription(resultCode);
                 } else {
                     result.code = resultCode;
                     result.message = errors.getErrorDescription(resultCode);
-                    result.kkmStatus = utils.getInt(aData, 2, 4);
-                    result.printerStatus = utils.getInt(aData, 12, 2);
-                    result.kkmSerialNum = utils.getString(aData, 15, 7);
-                    result.reportNum = utils.getInt(aData, 23, 5);
-                    result.sum = utils.getFloat(aData, 29, 15);
+                    result.kkmStatus = Utils.getInt(aData, 2, 4);
+                    result.printerStatus = Utils.getInt(aData, 12, 2);
+                    result.kkmSerialNum = Utils.getString(aData, 15, 7);
+                    result.reportNum = Utils.getInt(aData, 23, 5);
+                    result.sum = Utils.getFloat(aData, 29, 15);
                 }
             } else {
                 result.error = error;
@@ -163,19 +182,18 @@ define(function(require){
             data.push(54);
             data = data.concat(passwordData);
             data.push(0);
-            data = prepare(data);
+            data = Utils.prepare(data);
             Utils.print(data);
             serial.send(data, null, aCallback);
-            var textBytes = utils.stringToBytes(aText);
+            var textBytes = Utils.stringToBytes(aText);
             for (var i = 0; i < textBytes.length; i++) {
                 serial.send([textBytes[i]], null, aCallback);
                 Utils.print([textBytes[i]]);
             }
-            Utils.print([27,27]);
+            Utils.print([27, 27]);
             serial.send([27, 27], null, aCallback);
         };
-
-
-
     };
+
+    return MercuryMS;
 });

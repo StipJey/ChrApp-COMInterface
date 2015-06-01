@@ -52,7 +52,13 @@ SerialConnection.prototype.send = function(bytes) {
     throw 'Invalid connection';
   }
   
-  serial.send(this.connectionId, bytes, function() {});
+  serial.send(this.connectionId, bytes, function (aInfo) {
+    if (!aInfo.error && aData.length == aInfo.bytesSent) {
+      //Success
+    } else {
+      //We can try resend data.
+    }
+  });
 };
 
 SerialConnection.prototype.disconnect = function() {
