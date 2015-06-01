@@ -12,6 +12,7 @@ define(function(require){
         var etx = 3;
         var passwordData = [48,48,48,48];
         var password = "0000";
+
         
         this.options = {
             bufferSize: 4096,
@@ -36,7 +37,11 @@ define(function(require){
             throw "Пароль должен содержать 4 символа.";
         };
 
-        this.openSession = function (aNumber, aFamily, aCallback) { //открытие смены
+        this.openSession = function (aParams) { //открытие смены
+            var aNumber = aParams.number;
+            var aFamily = aParams.family;
+            var aCallback = aParams.callback;
+
             if (aNumber < 100 && aNumber > -1) {
                 if (aFamily && aFamily.length > 0 && aFamily.length < 41) {
                     var data = [];
@@ -107,13 +112,13 @@ define(function(require){
             }
         }
 
-        self.getReportZ = function (aFlags, aCallback) {//Закрытие смены
-            var flags = aFlags ? aFlags : new ReportFlags();
+        this.getReportZ = function (aFlags, aCallback) {//Закрытие смены
+            var flags = aFlags ? aFlags : new Utils.generateReportFlags();
             getReport(48, flags, 0, aCallback);
         };
 
-        self.getReportX = function (aFlags, aCashier, aCallback) {//сводный
-            var flags = aFlags ? aFlags : new ReportFlags();
+        this.getReportX = function (aFlags, aCashier, aCallback) {//сводный
+            var flags = aFlags ? aFlags : new Utils.generateReportFlags();
             getReport(48, flags, aCashier, aCallback);
         };
 
@@ -177,7 +182,7 @@ define(function(require){
             }
         }
 
-        self.printData = function (aText, aCallback) {
+        this.printData = function (aText, aCallback) {
             var data = [];
             data.push(54);
             data = data.concat(passwordData);
@@ -193,6 +198,56 @@ define(function(require){
             Utils.print([27, 27]);
             serial.send([27, 27], null, aCallback);
         };
+
+        //Все что выше реализовано Андрюхой. Переписано мной. Частично работает. Надо тестить.
+
+        this.sell = function(anItems){
+                var data = [];
+                var Reqs = {};
+                var documentFlags = Utils.generateDocumentFlags();
+                var Reqs = Utils.getCustomRequisites();
+
+
+                data.push(83); //0x53
+                data = data.concat(passwordData);
+                data.push(0);
+                data.push(30); //Продажа
+                data.push(0);
+                data.push(documentFlags); //Флаги документа
+                data.push(0);
+                data.push(Reqs.length); //Количество реквизитов
+                data.push(0);
+                for (var Req of Reqs)
+                {
+                    data.push(Req.type); //Тип реквизита
+                    data.push(0);
+                    data.push(Req.flags); //Флаги реквизита
+                    data.push(0);
+                    data.push(Req.horizontalShift); //Смещение по горизонтали от начала строки
+                    data.push(0);
+                    data.push(Req.verticalShift); //Смещение по вертикали
+                    data.push(0);
+                    data.push(Req.string); //Сам реквизит
+                    data.push(0);
+                }
+                for (var Req of anItems)
+                {
+                    data.push(11); //Тип реквизита
+                    data.push(0);
+                    data.push(Utils.generateReqFlag(Req.paymentMethod, )); //Флаги реквизита
+                    data.push(0);
+                    data.push(Req.horizontalShift); //Смещение по горизонтали от начала строки
+                    data.push(0);
+                    data.push(Req.verticalShift); //Смещение по вертикали
+                    data.push(0);
+                    data.push(Req.string); //Сам реквизит
+                    data.push(0);
+                }
+
+                data = prepare(data);
+                print(data);
+            };
+        }
     };
 
     return MercuryMS;
