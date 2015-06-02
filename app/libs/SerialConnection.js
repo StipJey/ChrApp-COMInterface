@@ -53,7 +53,7 @@ SerialConnection.prototype.send = function(bytes) {
   }
   
   serial.send(this.connectionId, bytes, function (aInfo) {
-    if (!aInfo.error && aData.length == aInfo.bytesSent) {
+    if (!aInfo.error && bytes.byteLength == aInfo.bytesSent) {
       //Success
     } else {
       //We can try resend data.
@@ -66,6 +66,10 @@ SerialConnection.prototype.disconnect = function() {
     throw 'Invalid connection';
   }
 };
+
+  SerialConnection.prototype.receiveHandler = function(aData){
+    console.log(aData);
+  }
 
 return SerialConnection;
 });

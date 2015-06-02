@@ -21,8 +21,19 @@ define(function(require){
             parityBit: "no",
             stopBits: "one"
         };
-        var serial = new SerialConnection(this.options);
-
+        this.connection = new SerialConnection(this.options);
+        var serial = this.connection;
+        serial.recieveHandler = function(aData){
+            var a = new Uint8Array(aData);
+            console.log(a);
+        }
+        this.connect = function(aPath) {
+            if (aPath){
+                this.connection.connect(aPath);
+            }else{
+                this.connection.connect(this.options.devicePath);
+            }
+        };
 
         this.getPassword = function () {
             return password;
@@ -139,9 +150,9 @@ define(function(require){
                     data.push(0);
                     data = data.concat(Utils.completeData(Utils.stringToBytes(aCashier.toString()), 2));
                     data.push(0);
-                    data = prepare(data);
+                    data = Utils.prepare(data);
                     Utils.print(data);
-                    serial.send(data, getReportResponse, aCallback);
+                    serial.send(Utils.convertArrayToBuffer(data), getReportResponse, aCallback);
                 } else {
                     if (aCallback) {
                         aCallback({
@@ -255,6 +266,8 @@ define(function(require){
 
                 data = Utils.prepare(data);
                 Utils.print(data);
+                serial.send(Utils.convertArrayToBuffer(data));
+
             };
         }
 

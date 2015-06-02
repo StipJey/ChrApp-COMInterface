@@ -7,30 +7,34 @@ define(function(require){
         var self = this;
 
         self.stringToBytes = function (aValue) {
-            var value = aValue.toString();
-            var len = value.length;
-            var data = [];
-            for (var i = 0; i < len; i++) {
-                var code = value.charCodeAt(i);
-                if (code >= 0 && code <= 255) {
-                    data.push(code);
-                } else if (getExtendASCIICodeFromUTF(code)) {
-                    data.push(getExtendASCIICodeFromUTF(code));
-                } else {
-                    data.push(63); //?
-                    console.error("Недопустимый символ '" + value.charAt(i) + "'");
+            if (aValue) {
+                var value = aValue.toString();
+                var len = value.length;
+                var data = [];
+                for (var i = 0; i < len; i++) {
+                    var code = value.charCodeAt(i);
+                    if (code >= 0 && code <= 255) {
+                        data.push(code);
+                    } else if (getExtendASCIICodeFromUTF(code)) {
+                        data.push(getExtendASCIICodeFromUTF(code));
+                    } else {
+                        data.push(63); //?
+                        console.error("Недопустимый символ '" + value.charAt(i) + "'");
+                    }
                 }
-            }
-            return data;
+                return data;
+            } else return 0;
         };
 
         self.completeData = function(aData, aNeedLength) {
             var data = [];
-            if (Array.isArray(aData)){
-                data = aData;
-            } else {
-                data[0] = aData;
-            }
+            if (aData) {
+                if (Array.isArray(aData)) {
+                    data = aData;
+                } else {
+                    data[0] = aData;
+                }
+            } else data[0] = 0;
             var len = aNeedLength - data.length;
             if (data && len > 0) {
                 for (var i = 0; i < len; i++) {
@@ -125,7 +129,7 @@ define(function(require){
         };
 
         self.generateReqFlag = function(aType, aSpec, anUseDefaultFont, aPack, aDiscount, aTaxGroup, aSmallFont, aDoubleWidthFont, aDoubleHeightFont, aNotPrint){
-            var result = new Uint8Array(4);
+            var result = [];
             var specialBits = typeof aSpec === 'number' ? aSpec : 0;
             var defaultFont = anUseDefaultFont ? 1 : 0;                                     //1 - игнорировать настройки и использовать стандартный шрифт
             var pack = aPack && aType == '11' ? 1 : 0;                                      //1 - Если это упаковка(только для "Цена услуги" - 11)
@@ -135,10 +139,6 @@ define(function(require){
             var doubleWidth = aDoubleWidthFont ? 1 : 0;                                     //ДВойная ширина, 1 - вкл
             var doubleHeight = aDoubleHeightFont ? 1 : 0;                                   //Двойная высота, 1 - вкл
             var notPrint = aNotPrint ? 1 : 0;                                               //1 - не печатать в журнале. Игнорируется некоторыми реквизитами.
-
-            for (var i = 0; i < result.length; i++){
-                result[i] = 0;
-            }
 
             result[0] |= specialBits;
             result[0] |= defaultFont << 5;
@@ -161,7 +161,7 @@ define(function(require){
             var extended = aExtended ? 1 : 0;
 
             this.getByte = function() {
-                var result = new Uint8Array(2);
+                var result = [];
                 for (var i = 0; i < result.length; i++){
                     result[i] = 0;
                 }
@@ -173,7 +173,20 @@ define(function(require){
                 return result;
             };
 
-            return this.getByte();
+            //return this.getByte();
+        }
+
+        self.convertArrayToBuffer = function (aData){
+            if (aData){
+                if(Array.isArray(aData)){
+                    var result = new ArrayBuffer(aData.length);
+                    var buffer = new Uint8Array(result);
+                    for (var i = 0, len = aData.length; i < len; i++) {
+                        buffer[i] = aData[i];
+                    }
+                    return result;
+                }
+            }
         }
     }
 

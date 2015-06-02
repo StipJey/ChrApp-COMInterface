@@ -6,7 +6,7 @@ define(function(){
             drivers : {
                 mercury315 : {
                     name :"Mercury 315",
-                    file :"Mercury315"
+                    file :"../scales/Mercury315"
                 }
             }
         },
@@ -15,6 +15,16 @@ define(function(){
             type_rus : "Дисплей",
             drivers : {
                 
+            }
+        },
+        kkm : {
+            type : "kkm",
+            type_rus : "Контрольно-кассовая машина",
+            drivers :{
+                mercuryMS : {
+                    name : "Mercury MS",
+                    file : "../kkms/MercuryMS"
+                }
             }
         },
         printer: {
