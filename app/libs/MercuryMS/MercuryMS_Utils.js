@@ -139,6 +139,8 @@ define(function(require){
             result |= doubleWidth << 13;
             result |= doubleHeight << 14;
             result |= notPrint << 15;
+
+            return result;
         };
 
         self.generateReportFlags = function(aCashierSum, aSectionSum, aFull, aAll, aExtended){

@@ -244,11 +244,10 @@ define(function(require){
                     data.push(0);
                 }
 
-                data = prepare(data);
-                print(data);
+                data = Utils.prepare(data);
+                Utils.print(data);
             };
         }
-    };
 
     return MercuryMS;
 });
