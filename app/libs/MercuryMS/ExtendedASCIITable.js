@@ -1,7 +1,7 @@
 define(function(require){
     function ExtendedASCIITable() {
         var table = [];
-        //Русские заглавные
+        //Р СѓСЃСЃРєРёРµ Р·Р°РіР»Р°РІРЅС‹Рµ
         table[1040] = 128;
         table[1041] = 129;
         table[1042] = 130;
@@ -34,7 +34,7 @@ define(function(require){
         table[1069] = 157;
         table[1070] = 158;
         table[1071] = 159;
-        //Русские строчные
+        //Р СѓСЃСЃРєРёРµ СЃС‚СЂРѕС‡РЅС‹Рµ
         table[1072] = 160;
         table[1073] = 161;
         table[1074] = 162;

@@ -18,7 +18,7 @@ define(function(require){
                     data.push(getExtendASCIICodeFromUTF(code));
                 } else {
                     data.push(63); //?
-                    console.error("Недопустимый символ '" + value.charAt(i) + "'");
+                    console.error("РќРµРґРѕРїСѓСЃС‚РёРјС‹Р№ СЃРёРјРІРѕР» '" + value.charAt(i) + "'");
                 }
             }
             return data;
@@ -119,26 +119,30 @@ define(function(require){
         };
 
         self.generateReqFlag = function(aType, aSpec, anUseDefaultFont, aPack, aDiscount, aTaxGroup, aSmallFont, aDoubleWidthFont, aDoubleHeightFont, aNotPrint){
-            var result = 0;
+            var result = new Uint8Array(4);
             var specialBits = typeof aSpec === 'number' ? aSpec : 0;
-            var defaultFont = anUseDefaultFont ? 1 : 0;                                     //1 - игнорировать настройки и использовать стандартный шрифт
-            var pack = aPack && aType == '11' ? 1 : 0;                                      //1 - Если это упаковка(только для "Цена услуги" - 11)
-            var discount = aDiscount ? 1 : 0;                                               //1 - если скидка, 0 - если надбавка
-            var taxGroup = aTaxGroup && (aType == '11' || aType == '21') ? aTaxGroup : 0;   //Для реквизита "Цена услуги", "Общая скидка/надбавка на чек" Налоговая группа от 0 до 4
+            var defaultFont = anUseDefaultFont ? 1 : 0;                                     //1 - РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ РЅР°СЃС‚СЂРѕР№РєРё Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ С€СЂРёС„С‚
+            var pack = aPack && aType == '11' ? 1 : 0;                                      //1 - Р•СЃР»Рё СЌС‚Рѕ СѓРїР°РєРѕРІРєР°(С‚РѕР»СЊРєРѕ РґР»СЏ "Р¦РµРЅР° СѓСЃР»СѓРіРё" - 11)
+            var discount = aDiscount ? 1 : 0;                                               //1 - РµСЃР»Рё СЃРєРёРґРєР°, 0 - РµСЃР»Рё РЅР°РґР±Р°РІРєР°
+            var taxGroup = aTaxGroup && (aType == '11' || aType == '21') ? aTaxGroup : 0;   //Р”Р»СЏ СЂРµРєРІРёР·РёС‚Р° "Р¦РµРЅР° СѓСЃР»СѓРіРё", "РћР±С‰Р°СЏ СЃРєРёРґРєР°/РЅР°РґР±Р°РІРєР° РЅР° С‡РµРє" РќР°Р»РѕРіРѕРІР°СЏ РіСЂСѓРїРїР° РѕС‚ 0 РґРѕ 4
             var font = aSmallFont ? 1 : 0;                                                  //0 - 14x30, 1 - 10x30
-            var doubleWidth = aDoubleWidthFont ? 1 : 0;                                     //ДВойная ширина, 1 - вкл
-            var doubleHeight = aDoubleHeightFont ? 1 : 0;                                   //Двойная высота, 1 - вкл
-            var notPrint = aNotPrint ? 1 : 0;                                               //1 - не печатать в журнале. Игнорируется некоторыми реквизитами.
+            var doubleWidth = aDoubleWidthFont ? 1 : 0;                                     //Р”Р’РѕР№РЅР°СЏ С€РёСЂРёРЅР°, 1 - РІРєР»
+            var doubleHeight = aDoubleHeightFont ? 1 : 0;                                   //Р”РІРѕР№РЅР°СЏ РІС‹СЃРѕС‚Р°, 1 - РІРєР»
+            var notPrint = aNotPrint ? 1 : 0;                                               //1 - РЅРµ РїРµС‡Р°С‚Р°С‚СЊ РІ Р¶СѓСЂРЅР°Р»Рµ. РРіРЅРѕСЂРёСЂСѓРµС‚СЃСЏ РЅРµРєРѕС‚РѕСЂС‹РјРё СЂРµРєРІРёР·РёС‚Р°РјРё.
 
-            result |= specialBits;
-            result |= defaultFont << 5;
-            result |= pack << 6;
-            result |= discount << 7;
-            result |= taxGroup << 8;
-            result |= font << 12;
-            result |= doubleWidth << 13;
-            result |= doubleHeight << 14;
-            result |= notPrint << 15;
+            for (var i = 0, i < result.length; i++){
+                result[i] = 0;
+            }
+
+            result[0] |= specialBits;
+            result[0] |= defaultFont << 5;
+            result[0] |= pack << 6;
+            result[0] |= discount << 7;
+            result[1] |= taxGroup;
+            result[1] |= font << 4;
+            result[1] |= doubleWidth << 5;
+            result[1] |= doubleHeight << 6;
+            result[1] |= notPrint << 7;
 
             return result;
         };
@@ -151,12 +155,15 @@ define(function(require){
             var extended = aExtended ? 1 : 0;
 
             this.getByte = function() {
-                var result = 0;
-                result |= extended << 4;
-                result |= all << 3;
-                result |= full << 2;
-                result |= sectionSum << 1;
-                result |= cashierSum;
+                var result = new Uint8Array(2);
+                for (var i = 0, i < result.length; i++){
+                    result[i] = 0;
+                }
+                result[0] |= extended << 4;
+                result[0] |= all << 3;
+                result[0] |= full << 2;
+                result[0] |= sectionSum << 1;
+                result[0] |= cashierSum;
                 return result;
             };
 

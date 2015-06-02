@@ -5,133 +5,133 @@ define(function(requery){
         var Reqs = [];
         Reqs.push({
             code : "00",
-            description : "Номер ККМ",
+            description : "РќРѕРјРµСЂ РљРљРњ",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "01",
-            description : "Наименование учреждения. Строка 1",
+            description : "РќР°РёРјРµРЅРѕРІР°РЅРёРµ СѓС‡СЂРµР¶РґРµРЅРёСЏ. РЎС‚СЂРѕРєР° 1",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "02",
-            description : "Наименование учреждения. Строка 2",
+            description : "РќР°РёРјРµРЅРѕРІР°РЅРёРµ СѓС‡СЂРµР¶РґРµРЅРёСЏ. РЎС‚СЂРѕРєР° 2",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "03",
-            description : "Наименование учреждения. Строка 3",
+            description : "РќР°РёРјРµРЅРѕРІР°РЅРёРµ СѓС‡СЂРµР¶РґРµРЅРёСЏ. РЎС‚СЂРѕРєР° 3",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "04",
-            description : "Наименование учреждения. Строка 4",
+            description : "РќР°РёРјРµРЅРѕРІР°РЅРёРµ СѓС‡СЂРµР¶РґРµРЅРёСЏ. РЎС‚СЂРѕРєР° 4",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "05",
-            description : "Дата и время совершения операции",
+            description : "Р”Р°С‚Р° Рё РІСЂРµРјСЏ СЃРѕРІРµСЂС€РµРЅРёСЏ РѕРїРµСЂР°С†РёРё",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "06",
-            description : "Номер кассира",
+            description : "РќРѕРјРµСЂ РєР°СЃСЃРёСЂР°",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "07",
-            description : "Номер документа",
+            description : "РќРѕРјРµСЂ РґРѕРєСѓРјРµРЅС‚Р°",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "08",
-            description : "Номер чека",
+            description : "РќРѕРјРµСЂ С‡РµРєР°",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "09",
-            description : "Номер счета",
+            description : "РќРѕРјРµСЂ СЃС‡РµС‚Р°",
             required : false,
             from : "user"
         });
         Reqs.push({
             code : "10",
-            description : "ИНН",
+            description : "РРќРќ",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "11",
-            description : "Цена услуги",
+            description : "Р¦РµРЅР° СѓСЃР»СѓРіРё",
             required : true,
             from : "user"
         });
         Reqs.push({
             code : "12",
-            description : "Итоговая сумма",
+            description : "РС‚РѕРіРѕРІР°СЏ СЃСѓРјРјР°",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "13",
-            description : "Уплаченная сумма",
+            description : "РЈРїР»Р°С‡РµРЅРЅР°СЏ СЃСѓРјРјР°",
             required : true,
             from : "user"
         });
         Reqs.push({
             code : "14",
-            description : "Сумма сдачи",
+            description : "РЎСѓРјРјР° СЃРґР°С‡Рё",
             required : true,
             from : "memory"
         });
         Reqs.push({
             code : "15",
-            description : "Сумма налогов по налоговой ставке 0",
+            description : "РЎСѓРјРјР° РЅР°Р»РѕРіРѕРІ РїРѕ РЅР°Р»РѕРіРѕРІРѕР№ СЃС‚Р°РІРєРµ 0",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "16",
-            description : "Сумма налогов по налоговой ставке 1",
+            description : "РЎСѓРјРјР° РЅР°Р»РѕРіРѕРІ РїРѕ РЅР°Р»РѕРіРѕРІРѕР№ СЃС‚Р°РІРєРµ 1",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "17",
-            description : "Сумма налогов по налоговой ставке 2",
+            description : "РЎСѓРјРјР° РЅР°Р»РѕРіРѕРІ РїРѕ РЅР°Р»РѕРіРѕРІРѕР№ СЃС‚Р°РІРєРµ 2",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "18",
-            description : "Сумма налогов по налоговой ставке 3",
+            description : "РЎСѓРјРјР° РЅР°Р»РѕРіРѕРІ РїРѕ РЅР°Р»РѕРіРѕРІРѕР№ СЃС‚Р°РІРєРµ 3",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "19",
-            description : "Сумма налогов по налоговой ставке 4",
+            description : "РЎСѓРјРјР° РЅР°Р»РѕРіРѕРІ РїРѕ РЅР°Р»РѕРіРѕРІРѕР№ СЃС‚Р°РІРєРµ 4",
             required : false,
             from : "memory"
         });
         Reqs.push({
             code : "21",
-            description : "Общая скидка или надбавка на чек",
+            description : "РћР±С‰Р°СЏ СЃРєРёРґРєР° РёР»Рё РЅР°РґР±Р°РІРєР° РЅР° С‡РµРє",
             required : false,
             from : "user"
         });
         Reqs.push({
             code : "99",
-            description : "Доп реквизит",
+            description : "Р”РѕРї СЂРµРєРІРёР·РёС‚",
             required : false,
             from : "user"
         });

@@ -6,7 +6,7 @@ define(function(require){
     var AppAPI = require('AppAPI');
     var Utils = require('../libs/MercuryMS/MercuryMS_Utils');
     var errors = require('../libs/MercuryMS/MercuryMS_Errors')
-
+    var Requisites = require('../libs/MercuryMS/MercuryMS_MandatoryReq')
     function MercuryMS(){
         var stx = 2;
         var etx = 3;
@@ -34,10 +34,10 @@ define(function(require){
                 passwordData = Utils.stringToBytes(password);
             //TO DO call KKM
             }
-            throw "Пароль должен содержать 4 символа.";
+            throw "РџР°СЂРѕР»СЊ РґРѕР»Р¶РµРЅ СЃРѕРґРµСЂР¶Р°С‚СЊ 4 СЃРёРјРІРѕР»Р°.";
         };
 
-        this.openSession = function (aParams) { //открытие смены
+        this.openSession = function (aParams) { //РѕС‚РєСЂС‹С‚РёРµ СЃРјРµРЅС‹
             var aNumber = aParams.number;
             var aFamily = aParams.family;
             var aCallback = aParams.callback;
@@ -58,14 +58,14 @@ define(function(require){
                 } else {
                     if (aCallback) {
                         aCallback({
-                            result: "Фамилия кассира должна быть не больше 40 символов и меньше 0"
+                            result: "Р¤Р°РјРёР»РёСЏ РєР°СЃСЃРёСЂР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РЅРµ Р±РѕР»СЊС€Рµ 40 СЃРёРјРІРѕР»РѕРІ Рё РјРµРЅСЊС€Рµ 0"
                         });
                     }
                 }
             } else {
                 if (aCallback) {
                     aCallback({
-                        result:"Номер кассира не может быть больше 99 и меньше 0"
+                        result:"РќРѕРјРµСЂ РєР°СЃСЃРёСЂР° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 99 Рё РјРµРЅСЊС€Рµ 0"
                     });
                 }
             }
@@ -78,16 +78,16 @@ define(function(require){
                         if (Utils.checkBCC(aData)) {
                             return "";
                         } else {
-                            return "Неверная контрольная сумма в ответе.";
+                            return "РќРµРІРµСЂРЅР°СЏ РєРѕРЅС‚СЂРѕР»СЊРЅР°СЏ СЃСѓРјРјР° РІ РѕС‚РІРµС‚Рµ.";
                         }
                     } else {
-                        return "Неверный тип сообщения в ответе.";
+                        return "РќРµРІРµСЂРЅС‹Р№ С‚РёРї СЃРѕРѕР±С‰РµРЅРёСЏ РІ РѕС‚РІРµС‚Рµ.";
                     }
                 } else {
-                    return "Неверный формат ответа.";
+                    return "РќРµРІРµСЂРЅС‹Р№ С„РѕСЂРјР°С‚ РѕС‚РІРµС‚Р°.";
                 }
             } else {
-                return "Нет данных ответа."
+                return "РќРµС‚ РґР°РЅРЅС‹С… РѕС‚РІРµС‚Р°."
             }
         }
 
@@ -112,12 +112,12 @@ define(function(require){
             }
         }
 
-        this.getReportZ = function (aFlags, aCallback) {//Закрытие смены
+        this.getReportZ = function (aFlags, aCallback) {//Р—Р°РєСЂС‹С‚РёРµ СЃРјРµРЅС‹
             var flags = aFlags ? aFlags : new Utils.generateReportFlags();
             getReport(48, flags, 0, aCallback);
         };
 
-        this.getReportX = function (aFlags, aCashier, aCallback) {//сводный
+        this.getReportX = function (aFlags, aCashier, aCallback) {//СЃРІРѕРґРЅС‹Р№
             var flags = aFlags ? aFlags : new Utils.generateReportFlags();
             getReport(48, flags, aCashier, aCallback);
         };
@@ -145,14 +145,14 @@ define(function(require){
                 } else {
                     if (aCallback) {
                         aCallback({
-                            result: "Не заданы параметры отчета."
+                            result: "РќРµ Р·Р°РґР°РЅС‹ РїР°СЂР°РјРµС‚СЂС‹ РѕС‚С‡РµС‚Р°."
                         });
                     }
                 }
             } else {
                 if (aCallback) {
                     aCallback({
-                        result: "Неверный тип отчета " + aType
+                        result: "РќРµРІРµСЂРЅС‹Р№ С‚РёРї РѕС‚С‡РµС‚Р° " + aType
                     });
                 }
             }
@@ -199,48 +199,47 @@ define(function(require){
             serial.send([27, 27], null, aCallback);
         };
 
-        //Все что выше реализовано Андрюхой. Переписано мной. Частично работает. Надо тестить.
+        //Р’СЃРµ С‡С‚Рѕ РІС‹С€Рµ СЂРµР°Р»РёР·РѕРІР°РЅРѕ РђРЅРґСЂСЋС…РѕР№. РџРµСЂРµРїРёСЃР°РЅРѕ РјРЅРѕР№. Р§Р°СЃС‚РёС‡РЅРѕ СЂР°Р±РѕС‚Р°РµС‚. РќР°РґРѕ С‚РµСЃС‚РёС‚СЊ.
 
         this.sell = function(anItems){
                 var data = [];
-                var Reqs = {};
                 var documentFlags = Utils.generateDocumentFlags();
-                var Reqs = Utils.getCustomRequisites();
+                var Reqs = Requisites.getReqs('required', true);
 
 
                 data.push(83); //0x53
-                data = data.concat(passwordData);
+                data = data.concat(passwordData); //4B
                 data.push(0);
-                data.push(30); //Продажа
+                data.push(30); //РџСЂРѕРґР°Р¶Р°
                 data.push(0);
-                data.push(documentFlags); //Флаги документа
+                data.push(documentFlags); //Р¤Р»Р°РіРё РґРѕРєСѓРјРµРЅС‚Р° 2B
                 data.push(0);
-                data.push(Reqs.length); //Количество реквизитов
+                data.push(Reqs.length); //РљРѕР»РёС‡РµСЃС‚РІРѕ СЂРµРєРІРёР·РёС‚РѕРІ 3B
                 data.push(0);
                 for (var Req of Reqs)
                 {
-                    data.push(Req.type); //Тип реквизита
+                    data.push(Req.code); //РўРёРї СЂРµРєРІРёР·РёС‚Р° 2B
                     data.push(0);
-                    data.push(Req.flags); //Флаги реквизита
+                    data.push(Utils.generateReqFlag(Req.code, 0, 1)); //Р¤Р»Р°РіРё СЂРµРєРІРёР·РёС‚Р° 4B
                     data.push(0);
-                    data.push(Req.horizontalShift); //Смещение по горизонтали от начала строки
+                    data.push(0); //РЎРјРµС‰РµРЅРёРµ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё 2B
                     data.push(0);
-                    data.push(Req.verticalShift); //Смещение по вертикали
+                    data.push(1); //РЎРјРµС‰РµРЅРёРµ РїРѕ РІРµСЂС‚РёРєР°Р»Рё 3B
                     data.push(0);
-                    data.push(Req.string); //Сам реквизит
+                    data.push(0); //РЎР°Рј СЂРµРєРІРёР·РёС‚ 40B
                     data.push(0);
                 }
                 for (var Req of anItems)
                 {
-                    data.push(11); //Тип реквизита
+                    data.push(11); //РўРёРї СЂРµРєРІРёР·РёС‚Р°
                     data.push(0);
-                    data.push(Utils.generateReqFlag(Req.paymentMethod, )); //Флаги реквизита
+                    data.push(Utils.generateReqFlag(Req.paymentMethod)); //Р¤Р»Р°РіРё СЂРµРєРІРёР·РёС‚Р°
                     data.push(0);
-                    data.push(Req.horizontalShift); //Смещение по горизонтали от начала строки
+                    data.push(Req.horizontalShift); //РЎРјРµС‰РµРЅРёРµ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
                     data.push(0);
-                    data.push(Req.verticalShift); //Смещение по вертикали
+                    data.push(Req.verticalShift); //РЎРјРµС‰РµРЅРёРµ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
                     data.push(0);
-                    data.push(Req.string); //Сам реквизит
+                    data.push(Req.string); //РЎР°Рј СЂРµРєРІРёР·РёС‚
                     data.push(0);
                 }
 
