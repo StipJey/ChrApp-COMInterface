@@ -25,13 +25,19 @@ define(function(require){
         };
 
         self.completeData = function(aData, aNeedLength) {
-            var len = aNeedLength - aData.length;
-            if (aData && len > 0) {
+            var data = [];
+            if (Array.isArray(aData)){
+                data = aData;
+            } else {
+                data[0] = aData;
+            }
+            var len = aNeedLength - data.length;
+            if (data && len > 0) {
                 for (var i = 0; i < len; i++) {
-                    aData.push(0);
+                    data.push(0);
                 }
             }
-            return aData;
+            return data;
         };
 
         self.checkBCC = function (aData) {
@@ -107,7 +113,7 @@ define(function(require){
                 case "close":
                     action = 1;
                     break;
-                case "cancel";
+                case "cancel":
                     action = 2;
                     break;
                 default :
@@ -130,7 +136,7 @@ define(function(require){
             var doubleHeight = aDoubleHeightFont ? 1 : 0;                                   //Двойная высота, 1 - вкл
             var notPrint = aNotPrint ? 1 : 0;                                               //1 - не печатать в журнале. Игнорируется некоторыми реквизитами.
 
-            for (var i = 0, i < result.length; i++){
+            for (var i = 0; i < result.length; i++){
                 result[i] = 0;
             }
 
@@ -156,7 +162,7 @@ define(function(require){
 
             this.getByte = function() {
                 var result = new Uint8Array(2);
-                for (var i = 0, i < result.length; i++){
+                for (var i = 0; i < result.length; i++){
                     result[i] = 0;
                 }
                 result[0] |= extended << 4;
