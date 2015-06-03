@@ -188,6 +188,17 @@ define(function(require){
                 }
             }
         }
+
+        self.bytesToHex = function(aData){
+            if (Array.isArray(aData)){
+                var code = "";
+                for (var liter of aData){
+                    code += String.fromCharCode(liter);
+                }
+                return parseInt(code, 16);
+            } else
+                return false;
+        }
     }
 
     return new Utils();

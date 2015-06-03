@@ -13,7 +13,54 @@ define(function(require){
         var passwordData = [48,48,48,48];
         var password = "0000";
 
-        
+        //Служебный код. Требует рефакторинга
+        var current_buffer = [];
+        function rHandler (buf) {
+            var bufView = new Uint8Array(buf);
+            for (var i = 0; i < bufView.length && current_buffer.length < 19; i++) {
+                current_buffer[current_buffer.length] = bufView[i];
+                console.log("!!!HANDLER!!!");
+                console.log(i);
+                console.log(current_buffer);
+            }
+            if (current_buffer.length == 19)
+                console.log("HANDLER_OUT");
+                console.log(current_buffer);
+                CheckSellResponce(current_buffer);
+        };
+
+        function CheckSellResponce(buf){
+            if (buf.length == 19) {
+                console.log("CHECK RESPONCE");
+                console.log(buf);
+                var stx = buf[0];
+                var code = buf[1];
+                var separator = buf[2];
+                var statusKKM = Utils.bytesToHex(buf.slice(3, 7)); //4B
+                var separator2 = buf[7];
+                var result = Utils.bytesToHex(buf.slice(8, 12)); //4B
+                var separator3 = buf[12];
+                var statusPrinter = Utils.bytesToHex(buf.slice(13, 15)); //2B
+                var separator4 = buf[15];
+                var BCC = Utils.bytesToHex(buf.slice(16, 18));
+                var etx = buf[18];
+
+                console.log("KKM status");
+                console.log(statusKKM);
+                console.log("result");
+                console.log(result);
+                var error = errors.getErrorDescription(result);
+                console.log("Сообщение ККМ: " + error);
+                console.log("Printer status");
+                console.log(statusPrinter);
+                if (separator == 0 && separator2 == 0 && separator3 == 0 && separator4 == 0)
+                    console.log("Разделители на месте");
+                console.log("Контрольная сумма");
+                console.log(BCC);
+                console.log(buf);
+            }
+        }
+
         this.options = {
             bufferSize: 4096,
             bitrate: 9600,
@@ -23,10 +70,8 @@ define(function(require){
         };
         this.connection = new SerialConnection(this.options);
         var serial = this.connection;
-        serial.recieveHandler = function(aData){
-            var a = new Uint8Array(aData);
-            console.log(a);
-        }
+        serial.recieveHandler = rHandler;
+
         this.connect = function(aPath) {
             if (aPath){
                 this.connection.connect(aPath);
@@ -65,7 +110,7 @@ define(function(require){
                     data.push(0);
                     data = Utils.prepare(data);
                     Utils.print(data);
-                    serial.send(data, registerCashierResponse, aCallback);
+                    serial.send(Utils.convertArrayToBuffer(data));
                 } else {
                     if (aCallback) {
                         aCallback({
@@ -124,7 +169,7 @@ define(function(require){
         }
 
         this.getReportZ = function (aFlags, aCallback) {//Закрытие смены
-            var flags = aFlags ? aFlags : new Utils.generateReportFlags();
+            var flags = aFlags ? aFlags : new Utils.generateReportFlags(0,0,1,0,0);
             getReport(48, flags, 0, aCallback);
         };
 
