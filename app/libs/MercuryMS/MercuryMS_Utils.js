@@ -2,12 +2,14 @@
  * Created by Work on 01.06.2015.
  */
 define(function(require){
+    var ASCII = require('./ExtendedASCIITable');
+
 
     function Utils() {
         var self = this;
 
         self.stringToBytes = function (aValue) {
-            if (aValue) {
+            if (aValue != 'undefined') {
                 var value = aValue.toString();
                 var len = value.length;
                 var data = [];
@@ -15,8 +17,8 @@ define(function(require){
                     var code = value.charCodeAt(i);
                     if (code >= 0 && code <= 255) {
                         data.push(code);
-                    } else if (getExtendASCIICodeFromUTF(code)) {
-                        data.push(getExtendASCIICodeFromUTF(code));
+                    } else if (ASCII.getExtendASCIICodeFromUTF(code)) {
+                        data.push(ASCII.getExtendASCIICodeFromUTF(code));
                     } else {
                         data.push(63); //?
                         console.error("Недопустимый символ '" + value.charAt(i) + "'");
