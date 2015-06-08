@@ -139,7 +139,7 @@ define(function (require) {
             }
             result |= action << 2;
             result |= extended << 4;
-            return result > 9 ? result : "0" + result;
+            return result;
         };
 
         self.generateReqFlag = function (aType, aSpec, anUseDefaultFont, aPack, aDiscount, aTaxGroup, aSmallFont, aDoubleWidthFont, aDoubleHeightFont, aNotPrint) {
@@ -216,24 +216,20 @@ define(function (require) {
             } else
                 return false;
         }
+
+        self.intToString = function(aNumber, aNeedLength) {
+            if (aNumber != null && aNeedLength) {
+                var value = aNumber.toString();
+                while (value.length < aNeedLength){
+                    value = "0" + value;
+                }
+                return value;
+            }
+            return null;
+        };
     }
 
     return new Utils();
 });
 
 
-//    self.convertIntToString = function(aNumber, aNeedLength) {
-//        if (aNumber != null && aNeedLength) {
-//            var value = aNumber.toString();
-//            var len = aNeedLength - value.length;
-//            if (len > 0) {
-//                var complete = "";
-//                for (var i=0; i < len; i++) {
-//                    complete += "0";
-//                }
-//                value = complete + value;
-//            }
-//            return value;
-//        }
-//        return null;
-//    };

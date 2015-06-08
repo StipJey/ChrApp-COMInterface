@@ -268,9 +268,9 @@ define(function(require){
                 data.push(0);
                 data = data.concat(Utils.stringToBytes(0)); //Продажа
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(documentFlags), 2)); //Флаги документа 2B
+                data = data.concat(Utils.stringToBytes(Utils.intToString(documentFlags, 2))); //Флаги документа 2B
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(Reqs.length), 3)); //Количество реквизитов 3B
+                data = data.concat(Utils.stringToBytes(Utils.intToString(Reqs.length, 3))); //Количество реквизитов 3B
                 data.push(0);
                 for (var Req of Reqs)
                 {
@@ -286,11 +286,11 @@ define(function(require){
 
                     if (Req.from == "user"){
                         if (Req.code == "11"){
-                            data = data.concat(Utils.completeData(Utils.stringToBytes(2), 2)); //Номер отдела, секции 2B
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(2), 2)); //Номер отдела, секции 2B
                             data.push(0);
                             data = data.concat(Utils.addTheZeros(Utils.stringToBytes(15), 6)); //Код товара 6B
                             data.push(0);
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(0), 5)); //Процентная скидка, надбавка 5B
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(11), 5)); //Процентная скидка, надбавка 5B
                             data.push(0);
                             data = data.concat(Utils.addTheZeros(Utils.stringToBytes(1), 11)); //Количество 11B
                             data.push(0);
