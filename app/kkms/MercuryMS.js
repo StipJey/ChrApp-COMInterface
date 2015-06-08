@@ -259,7 +259,7 @@ define(function(require){
 
         this.sell = function(anItems){
                 var data = [];
-                var documentFlags = Utils.generateDocumentFlags();
+                var documentFlags = Utils.generateDocumentFlags('close');
                 var Reqs = Requisites.getReqs('required', true);
                 var stroka = 1;
 
@@ -283,50 +283,30 @@ define(function(require){
                     data.push(0);
                     data = data.concat(Utils.completeData(Utils.stringToBytes(stroka++), 3)); //Смещение по вертикали 3B
                     data.push(0);
+
                     if (Req.from == "user"){
                         if (Req.code == "11"){
                             data = data.concat(Utils.completeData(Utils.stringToBytes(2), 2)); //Номер отдела, секции 2B
                             data.push(0);
-                            data = data.concat(Utils.completeData(Utils.stringToBytes(15), 6)); //Код товара 6B
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(15), 6)); //Код товара 6B
                             data.push(0);
-                            data = data.concat(Utils.completeData(Utils.stringToBytes(0), 5)); //Процентная скидка, надбавка 5B
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(0), 5)); //Процентная скидка, надбавка 5B
                             data.push(0);
-                            data = data.concat(Utils.completeData(Utils.stringToBytes(3), 11)); //Количество 11B
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(1), 11)); //Количество 11B
                             data.push(0);
-                            data = data.concat(Utils.completeData(Utils.stringToBytes(31), 11)); //Цена услуги 11B
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(3), 11)); //Цена услуги 11B
                             data.push(0);
-                            data = data.concat(Utils.completeData(Utils.stringToBytes("КГ"), 5)); //Единица измерения 5B
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes("КГ"), 5)); //Единица измерения 5B
                         } else {
-                            data = data.concat(Utils.completeData(Utils.stringToBytes("1000"), 40));
+                            data = data.concat([0,0,0,0,0]);
+                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes("10"), 40));
                         }
                     } else {
-                        data = data.concat(Utils.completeData(0, 40)); //Сам реквизит 40B
+                        data = data.concat([0,0,0,0,0]);
+                        data = data.concat(Utils.addTheZeros(0, 40)); //Сам реквизит 40B
                     }
                     data.push(0);
                 }
-                //for (var Req of anItems)
-                //{
-                //    data = data.concat(Utils.completeData(11, 2)); //Тип реквизита 2B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Utils.generateReqFlag(Req.paymentMethod), 4)); //Флаги реквизита 4B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Req.horizontalShift, 2)); //Смещение по горизонтали от начала строки 2B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Req.verticalShift, 3)); //Смещение по вертикали 3B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Req.section, 2)); //Номер отдела, секции 2B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Req.code, 6)); //Код товара 6B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Req.discont, 5)); //Процентная скидка, надбавка 5B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Req.quantity, 11)); //Количество 11B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Req.cost, 11)); //Цена услуги 11B
-                //    data.push(0);
-                //    data = data.concat(Utils.completeData(Utils.stringToBytes(Req.measure), 5)); //Единица измерения 5B
-                //    data.push(0);
-                //}
 
                 data = Utils.prepare(data);
                 Utils.print(data);

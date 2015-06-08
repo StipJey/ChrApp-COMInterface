@@ -1,7 +1,7 @@
 /**
  * Created by Work on 01.06.2015.
  */
-define(function(require){
+define(function (require) {
     var ASCII = require('./ExtendedASCIITable');
 
 
@@ -28,7 +28,22 @@ define(function(require){
             } else return 0;
         };
 
-        self.completeData = function(aData, aNeedLength) {
+        self.completeData = function (aData, aNeedLength) {
+            if (typeof(aData) == "string") {
+                while (aData.length < aNeedLength) {
+                    aData = "0" + aData;
+                }
+                return aData;
+            } else if (Array.isArray(aData)){
+                while (aData.length < aNeedLength) {
+                    aData.unshift(48);
+                }
+                return aData;
+            }
+            return aData;
+        };
+
+        self.addTheZeros = function (aData, aNeedLength) {
             var data = [];
             if (aData) {
                 if (Array.isArray(aData)) {
@@ -37,11 +52,8 @@ define(function(require){
                     data[0] = aData;
                 }
             } else data[0] = 0;
-            var len = aNeedLength - data.length;
-            if (data && len > 0) {
-                for (var i = 0; i < len; i++) {
-                    data.push(0);
-                }
+            while (data.length < aNeedLength) {
+                data.push(0);
             }
             return data;
         };
@@ -57,7 +69,7 @@ define(function(require){
             return false;
         };
 
-        self.calcBCC = function(aData, offset, length) {
+        self.calcBCC = function (aData, offset, length) {
             if (Array.isArray(aData)) {
                 var bcc = 0;
                 offset = offset ? offset : 0;
@@ -88,7 +100,7 @@ define(function(require){
             return parseFloat(self.getString(aData, aOffset, aLength));
         };
 
-        self.prepare = function(aData){
+        self.prepare = function (aData) {
             var stx = 2;
             var etx = 3;
             var bcc = self.calcBCC(aData);
@@ -99,20 +111,20 @@ define(function(require){
             return aData;
         };
 
-        self.print = function(aData) {
+        self.print = function (aData) {
             var mes = "";
             console.log("Request");
-            aData.forEach(function(elem) {
+            aData.forEach(function (elem) {
                 mes += elem.toString(16).toUpperCase() + " ";
             });
             console.log(mes);
         };
 
-        self.generateDocumentFlags = function(anAction, anExtendedReport){
+        self.generateDocumentFlags = function (anAction, anExtendedReport) {
             var result = 0;
             var action = 0;
             var extended = anExtendedReport ? 1 : 0;
-            switch (anAction){
+            switch (anAction) {
                 case "register":
                     action = 0;
                     break;
@@ -127,12 +139,15 @@ define(function(require){
             }
             result |= action << 2;
             result |= extended << 4;
-            return result;
+            return result > 9 ? result : "0" + result;
         };
 
-        self.generateReqFlag = function(aType, aSpec, anUseDefaultFont, aPack, aDiscount, aTaxGroup, aSmallFont, aDoubleWidthFont, aDoubleHeightFont, aNotPrint){
-            var result = [];
+        self.generateReqFlag = function (aType, aSpec, anUseDefaultFont, aPack, aDiscount, aTaxGroup, aSmallFont, aDoubleWidthFont, aDoubleHeightFont, aNotPrint) {
+            var result = 0;
             var specialBits = typeof aSpec === 'number' ? aSpec : 0;
+            if (aType == "11"){
+                specialBits = 2;
+            }
             var defaultFont = anUseDefaultFont ? 1 : 0;                                     //1 - игнорировать настройки и использовать стандартный шрифт
             var pack = aPack && aType == '11' ? 1 : 0;                                      //1 - Если это упаковка(только для "Цена услуги" - 11)
             var discount = aDiscount ? 1 : 0;                                               //1 - если скидка, 0 - если надбавка
@@ -142,29 +157,29 @@ define(function(require){
             var doubleHeight = aDoubleHeightFont ? 1 : 0;                                   //Двойная высота, 1 - вкл
             var notPrint = aNotPrint ? 1 : 0;                                               //1 - не печатать в журнале. Игнорируется некоторыми реквизитами.
 
-            result[0] |= specialBits;
-            result[0] |= defaultFont << 5;
-            result[0] |= pack << 6;
-            result[0] |= discount << 7;
-            result[1] |= taxGroup;
-            result[1] |= font << 4;
-            result[1] |= doubleWidth << 5;
-            result[1] |= doubleHeight << 6;
-            result[1] |= notPrint << 7;
+            result |= specialBits;
+            result |= defaultFont << 5;
+            result |= pack << 6;
+            result |= discount << 7;
+            result |= taxGroup << 8;
+            result |= font << 12;
+            result |= doubleWidth << 13;
+            result |= doubleHeight << 14;
+            result |= notPrint << 15;
 
-            return result;
+            return result.toString(16);
         };
 
-        self.generateReportFlags = function(aCashierSum, aSectionSum, aFull, aAll, aExtended){
+        self.generateReportFlags = function (aCashierSum, aSectionSum, aFull, aAll, aExtended) {
             var cashierSum = aCashierSum ? 1 : 0;
             var sectionSum = aSectionSum ? 1 : 0;
             var full = aFull ? 1 : 0;
             var all = aAll ? 1 : 0;
             var extended = aExtended ? 1 : 0;
 
-            this.getByte = function() {
+            this.getByte = function () {
                 var result = [];
-                for (var i = 0; i < result.length; i++){
+                for (var i = 0; i < result.length; i++) {
                     result[i] = 0;
                 }
                 result[0] |= extended << 4;
@@ -178,9 +193,9 @@ define(function(require){
             //return this.getByte();
         }
 
-        self.convertArrayToBuffer = function (aData){
-            if (aData){
-                if(Array.isArray(aData)){
+        self.convertArrayToBuffer = function (aData) {
+            if (aData) {
+                if (Array.isArray(aData)) {
                     var result = new ArrayBuffer(aData.length);
                     var buffer = new Uint8Array(result);
                     for (var i = 0, len = aData.length; i < len; i++) {
@@ -191,10 +206,10 @@ define(function(require){
             }
         }
 
-        self.bytesToHex = function(aData){
-            if (Array.isArray(aData)){
+        self.bytesToHex = function (aData) {
+            if (Array.isArray(aData)) {
                 var code = "";
-                for (var liter of aData){
+                for (var liter of aData) {
                     code += String.fromCharCode(liter);
                 }
                 return parseInt(code, 16);
@@ -205,7 +220,6 @@ define(function(require){
 
     return new Utils();
 });
-
 
 
 //    self.convertIntToString = function(aNumber, aNeedLength) {
