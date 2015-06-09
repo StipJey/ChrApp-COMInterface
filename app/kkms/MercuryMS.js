@@ -257,63 +257,98 @@ define(function(require){
 
         //Все что выше реализовано Андрюхой. Переписано мной. Частично работает. Надо тестить.
 
-        this.sell = function(anItems){
-                var data = [];
-                var documentFlags = Utils.generateDocumentFlags('close');
-                var Reqs = Requisites.getReqs('required', true);
-                var stroka = 1;
+        function addItem(anItem, aLine){
+            var data = [];
+            data = data.concat(Utils.completeData(Utils.stringToBytes("99"), 2)); //Тип реквизита 2B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(Req.code, 0, 1)), 4)); //Флаги реквизита 4B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine), 3)); //Смещение по вертикали 3B
+            data.push(0);
+            data = data.concat([0,0,0,0,0]);
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.caption), 40)); //Сам реквизит 40B
+            data.push(0);
 
-                data.push(83); //0x53
-                data = data.concat(Utils.completeData(passwordData, 4)); //4B
-                data.push(0);
-                data = data.concat(Utils.stringToBytes(0)); //Продажа
-                data.push(0);
-                data = data.concat(Utils.stringToBytes(Utils.intToString(documentFlags, 2))); //Флаги документа 2B
-                data.push(0);
-                data = data.concat(Utils.stringToBytes(Utils.intToString(Reqs.length, 3))); //Количество реквизитов 3B
-                data.push(0);
-                for (var Req of Reqs)
-                {
-
-                    data = data.concat(Utils.completeData(Utils.stringToBytes(Req.code), 2)); //Тип реквизита 2B
-                    data.push(0);
-                    data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(Req.code, 0, 1)), 4)); //Флаги реквизита 4B
-                    data.push(0);
-                    data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
-                    data.push(0);
-                    data = data.concat(Utils.completeData(Utils.stringToBytes(stroka++), 3)); //Смещение по вертикали 3B
-                    data.push(0);
-
-                    if (Req.from == "user"){
-                        if (Req.code == "11"){
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(2), 2)); //Номер отдела, секции 2B
-                            data.push(0);
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(15), 6)); //Код товара 6B
-                            data.push(0);
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(11), 5)); //Процентная скидка, надбавка 5B
-                            data.push(0);
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(1), 11)); //Количество 11B
-                            data.push(0);
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(3), 11)); //Цена услуги 11B
-                            data.push(0);
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes("КГ"), 5)); //Единица измерения 5B
-                        } else {
-                            data = data.concat([0,0,0,0,0]);
-                            data = data.concat(Utils.addTheZeros(Utils.stringToBytes("10"), 40));
-                        }
-                    } else {
-                        data = data.concat([0,0,0,0,0]);
-                        data = data.concat(Utils.addTheZeros(0, 40)); //Сам реквизит 40B
-                    }
-                    data.push(0);
-                }
-
-                data = Utils.prepare(data);
-                Utils.print(data);
-                serial.send(Utils.convertArrayToBuffer(data));
-
-            };
+            data = data.concat(Utils.completeData(Utils.stringToBytes("11"), 2)); //Тип реквизита 2B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(Req.code, 0, 1)), 4)); //Флаги реквизита 4B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine + 1), 3)); //Смещение по вертикали 3B
+            data.push(0);
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.department), 2)); //Номер отдела, секции 2B
+            data.push(0);
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.code), 6)); //Код товара 6B
+            data.push(0);
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.discount), 5)); //Процентная скидка, надбавка 5B
+            data.push(0);
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.quantity), 11)); //Количество 11B
+            data.push(0);
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.cost), 11)); //Цена услуги 11B
+            data.push(0);
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.measure), 5)); //Единица измерения 5B
+            data.push(0);
+            return data;
         }
+
+        function addReq(aReq, aLine, aValue){
+            var data = [];
+            data = data.concat(Utils.completeData(Utils.stringToBytes(aReq.code), 2)); //Тип реквизита 2B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(aReq.code, 0, 1)), 4)); //Флаги реквизита 4B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+            data.push(0);
+            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine), 3)); //Смещение по вертикали 3B
+            data.push(0);
+            data = data.concat([0,0,0,0,0]);
+            data = data.concat(Utils.addTheZeros(aValue ? Utils.stringToBytes(aValue) : 0, 40)); //Сам реквизит 40B
+            data.push(0);
+            return data;
+        }
+
+        function addSellHead()
+        {
+            var data = [];
+            data.push(83); //0x53
+            data = data.concat(Utils.completeData(passwordData, 4)); //4B
+            data.push(0);
+            data = data.concat(Utils.stringToBytes(0)); //Продажа
+            data.push(0);
+            data = data.concat(Utils.stringToBytes(Utils.intToString(documentFlags, 2))); //Флаги документа 2B
+            data.push(0);
+            data = data.concat(Utils.stringToBytes(Utils.intToString(Reqs.length + anOrder.items.length + 1, 3))); //Количество реквизитов 3B
+            data.push(0);
+            return data;
+        }
+
+        this.sell = function(anOrder){
+            var data = [];
+            var documentFlags = Utils.generateDocumentFlags('close');
+            var Reqs = Requisites.getReqs('required', true);
+            var stroka = 0;
+
+            data = data.concat(addSellHead());
+
+            for (var Req of Reqs)
+            {
+                if (Req.code == "11"){
+                    for (var item of anOrder.items)
+                    {
+                        data = data.concat(addItem(item, stroka++));
+                    }
+                } else {
+                    data = data.concat(addReq(Req, stroka++, Req.code == "13" ? anOrder.money : null));
+                }
+            }
+
+            data = Utils.prepare(data);
+            Utils.print(data);
+            serial.send(Utils.convertArrayToBuffer(data));
+        };
 
     return MercuryMS;
 });
