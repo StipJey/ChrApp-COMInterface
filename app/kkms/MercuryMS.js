@@ -5,31 +5,43 @@ define(function(require){
     var SerialConnection = require('../libs/SerialConnection');
     var AppAPI = require('AppAPI');
     var Utils = require('../libs/MercuryMS/MercuryMS_Utils');
-    var errors = require('../libs/MercuryMS/MercuryMS_Errors')
-    var Requisites = require('../libs/MercuryMS/MercuryMS_MandatoryReq')
-    function MercuryMS(){
+    var errors = require('../libs/MercuryMS/MercuryMS_Errors');
+    var Requisites = require('../libs/MercuryMS/MercuryMS_MandatoryReq');
+
+    function MercuryMS() {
         var stx = 2;
         var etx = 3;
-        var passwordData = [48,48,48,48];
+        var passwordData = [48, 48, 48, 48];
         var password = "0000";
 
         //Служебный код. Требует рефакторинга
         var current_buffer = [];
-        function rHandler (buf) {
+
+        function rHandler(buf) {
             var bufView = new Uint8Array(buf);
-            for (var i = 0; i < bufView.length && current_buffer.length < 19; i++) {
+            for (var i = 0; i < bufView.length; i++) {
                 current_buffer[current_buffer.length] = bufView[i];
                 console.log("!!!HANDLER!!!");
                 console.log(i);
                 console.log(current_buffer);
             }
-            if (current_buffer.length == 19)
+            if (current_buffer[current_buffer.length - 1] == 3) {
+                var indexFirst = 0;
+                var index = 0;
+                current_buffer.forEach(function (byte){
+                    if (byte == 2){
+                        indexFirst = index;
+                    }
+                    index++;
+                });
+                current_buffer.splice(0, indexFirst);
                 console.log("HANDLER_OUT");
                 console.log(current_buffer);
                 CheckSellResponce(current_buffer);
-        };
+            }
+        }
 
-        function CheckSellResponce(buf){
+        function CheckSellResponce(buf) {
             if (buf.length == 19) {
                 console.log("CHECK RESPONCE");
                 console.log(buf);
@@ -49,6 +61,7 @@ define(function(require){
                 console.log(statusKKM);
                 console.log("result");
                 console.log(result);
+                AppAPI(result,'go');
                 var error = errors.getErrorDescription(result);
                 console.log("Сообщение ККМ: " + error);
                 console.log("Printer status");
@@ -68,14 +81,15 @@ define(function(require){
             parityBit: "no",
             stopBits: "one"
         };
+
         this.connection = new SerialConnection(this.options);
         var serial = this.connection;
         serial.recieveHandler = rHandler;
 
-        this.connect = function(aPath) {
-            if (aPath){
+        this.connect = function (aPath) {
+            if (aPath) {
                 this.connection.connect(aPath);
-            }else{
+            } else {
                 this.connection.connect(this.options.devicePath);
             }
         };
@@ -88,7 +102,7 @@ define(function(require){
             if (aValue.length == 4) {
                 password = aValue;
                 passwordData = Utils.stringToBytes(password);
-            //TO DO call KKM
+                //TO DO call KKM
             }
             throw "Пароль должен содержать 4 символа.";
         };
@@ -121,7 +135,7 @@ define(function(require){
             } else {
                 if (aCallback) {
                     aCallback({
-                        result:"Номер кассира не может быть больше 99 и меньше 0"
+                        result: "Номер кассира не может быть больше 99 и меньше 0"
                     });
                 }
             }
@@ -169,7 +183,7 @@ define(function(require){
         }
 
         this.getReportZ = function (aFlags, aCallback) {//Закрытие смены
-            var flags = aFlags ? aFlags : new Utils.generateReportFlags(0,0,1,0,0);
+            var flags = aFlags ? aFlags : new Utils.generateReportFlags(0, 0, 1, 0, 0);
             getReport(48, flags, 0, aCallback);
         };
 
@@ -180,7 +194,7 @@ define(function(require){
 
         function getReport(aType, aFlags, aCashier, aCallback) {
             function checkType(aType) {
-                return aType && (aType == 48 || aType == 49 || aType == 50 || aType ==51);
+                return aType && (aType == 48 || aType == 49 || aType == 50 || aType == 51);
             }
 
             if (checkType(aType)) {
@@ -215,7 +229,7 @@ define(function(require){
         }
 
         function getReportResponse(aData, aCallback) {
-            var error = checkResponse(aData, 95)
+            var error = checkResponse(aData, 95);
             var result = {};
             if (!error) {
                 var resultCode = Utils.getInt(aData, 7, 4);
@@ -257,23 +271,23 @@ define(function(require){
 
         //Все что выше реализовано Андрюхой. Переписано мной. Частично работает. Надо тестить.
 
-        function addItem(anItem, aLine){
+        function addItem(anItem, aLine) {
             var data = [];
             data = data.concat(Utils.completeData(Utils.stringToBytes("99"), 2)); //Тип реквизита 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(Req.code, 0, 1)), 4)); //Флаги реквизита 4B
+            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("99", 0, 1)), 4)); //Флаги реквизита 4B
             data.push(0);
             data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
             data.push(0);
             data = data.concat(Utils.completeData(Utils.stringToBytes(aLine), 3)); //Смещение по вертикали 3B
             data.push(0);
-            data = data.concat([0,0,0,0,0]);
+            data = data.concat([0, 0, 0, 0, 0]);
             data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.caption), 40)); //Сам реквизит 40B
             data.push(0);
 
             data = data.concat(Utils.completeData(Utils.stringToBytes("11"), 2)); //Тип реквизита 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(Req.code, 0, 1)), 4)); //Флаги реквизита 4B
+            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("11", 0, 1)), 4)); //Флаги реквизита 4B
             data.push(0);
             data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
             data.push(0);
@@ -294,7 +308,7 @@ define(function(require){
             return data;
         }
 
-        function addReq(aReq, aLine, aValue){
+        function addReq(aReq, aLine, aValue) {
             var data = [];
             data = data.concat(Utils.completeData(Utils.stringToBytes(aReq.code), 2)); //Тип реквизита 2B
             data.push(0);
@@ -304,41 +318,47 @@ define(function(require){
             data.push(0);
             data = data.concat(Utils.completeData(Utils.stringToBytes(aLine), 3)); //Смещение по вертикали 3B
             data.push(0);
-            data = data.concat([0,0,0,0,0]);
+            data = data.concat([0, 0, 0, 0, 0]);
             data = data.concat(Utils.addTheZeros(aValue ? Utils.stringToBytes(aValue) : 0, 40)); //Сам реквизит 40B
             data.push(0);
             return data;
         }
 
-        function addSellHead()
-        {
+        function addFiscalHead(r, i, anOperationType) {
+            switch(anOperationType){
+                case "sell" : anOperationType = 0; break;
+                case "refund" : anOperationType = 1; r -= 2; break;
+            }
+
             var data = [];
             data.push(83); //0x53
             data = data.concat(Utils.completeData(passwordData, 4)); //4B
             data.push(0);
-            data = data.concat(Utils.stringToBytes(0)); //Продажа
+            data = data.concat(Utils.stringToBytes(anOperationType)); //Тип операции
             data.push(0);
-            data = data.concat(Utils.stringToBytes(Utils.intToString(documentFlags, 2))); //Флаги документа 2B
+            data = data.concat(Utils.stringToBytes(Utils.intToString(Utils.generateDocumentFlags('close'), 2))); //Флаги документа 2B
             data.push(0);
-            data = data.concat(Utils.stringToBytes(Utils.intToString(Reqs.length + anOrder.items.length + 1, 3))); //Количество реквизитов 3B
+            data = data.concat(Utils.stringToBytes(Utils.intToString(r - 1 + i * 2, 3))); //Количество реквизитов 3B
             data.push(0);
             return data;
         }
 
-        this.sell = function(anOrder){
+        function fiscal(anOrder, aType){
             var data = [];
             var documentFlags = Utils.generateDocumentFlags('close');
             var Reqs = Requisites.getReqs('required', true);
             var stroka = 0;
 
-            data = data.concat(addSellHead());
+            data = data.concat(addFiscalHead(Reqs.length, anOrder.items.length, aType));
 
-            for (var Req of Reqs)
-            {
-                if (Req.code == "11"){
-                    for (var item of anOrder.items)
-                    {
+            for (var Req of Reqs) {
+                if (aType == "refund" && (Req.code == "13" || Req.code == "14")){
+                    continue;
+                }
+                if (Req.code == "11") {
+                    for (var item of anOrder.items) {
                         data = data.concat(addItem(item, stroka++));
+                        stroka++;
                     }
                 } else {
                     data = data.concat(addReq(Req, stroka++, Req.code == "13" ? anOrder.money : null));
@@ -348,7 +368,16 @@ define(function(require){
             data = Utils.prepare(data);
             Utils.print(data);
             serial.send(Utils.convertArrayToBuffer(data));
+        }
+
+        this.refund = function(anOrder){
+            fiscal(anOrder, "refund");
         };
+
+        this.sell = function (anOrder) {
+            fiscal(anOrder, "sell");
+        };
+    }
 
     return MercuryMS;
 });
