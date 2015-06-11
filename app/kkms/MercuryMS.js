@@ -6,7 +6,7 @@ define(function(require){
     var AppAPI = require('AppAPI');
     var Utils = require('../libs/MercuryMS/MercuryMS_Utils');
     var errors = require('../libs/MercuryMS/MercuryMS_Errors');
-    var Requisites = require('../libs/MercuryMS/MercuryMS_MandatoryReq');
+    var Requisites = require('../libs/MercuryMS/MercuryMS_Requisites');
 
     function MercuryMS() {
         var stx = 2;
@@ -269,35 +269,38 @@ define(function(require){
             serial.send([27, 27], null, aCallback);
         };
 
-        //Все что выше реализовано Андрюхой. Переписано мной. Частично работает. Надо тестить.
 
         function addItem(anItem, aLine) {
             var data = [];
-            data = data.concat(Utils.completeData(Utils.stringToBytes("99"), 2)); //Тип реквизита 2B
-            data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("99", 0, 1)), 4)); //Флаги реквизита 4B
-            data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
-            data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine), 3)); //Смещение по вертикали 3B
-            data.push(0);
-            data = data.concat([0, 0, 0, 0, 0]);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.caption), 40)); //Сам реквизит 40B
-            data.push(0);
+
+            if (anItem.caption)
+            {
+                data = data.concat(Utils.completeData(Utils.stringToBytes("99"), 2)); //Тип реквизита 2B
+                data.push(0);
+                data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("99", 0, 1)), 4)); //Флаги реквизита 4B
+                data.push(0);
+                data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+                data.push(0);
+                data = data.concat(Utils.completeData(Utils.stringToBytes(aLine++), 3)); //Смещение по вертикали 3B
+                data.push(0);
+                data = data.concat([0, 0, 0, 0, 0]);
+                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.caption), 40)); //Сам реквизит 40B
+                data.push(0);
+            }
 
             data = data.concat(Utils.completeData(Utils.stringToBytes("11"), 2)); //Тип реквизита 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("11", 0, 1)), 4)); //Флаги реквизита 4B
+            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("11", 2, 1)), 4)); //Флаги реквизита 4B
             data.push(0);
             data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine + 1), 3)); //Смещение по вертикали 3B
+            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine++), 3)); //Смещение по вертикали 3B
             data.push(0);
             data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.department), 2)); //Номер отдела, секции 2B
             data.push(0);
             data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.code), 6)); //Код товара 6B
             data.push(0);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.discount), 5)); //Процентная скидка, надбавка 5B
+            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.discount ? anItem.discount : 0), 5)); //Процентная скидка, надбавка 5B
             data.push(0);
             data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.quantity), 11)); //Количество 11B
             data.push(0);
@@ -305,14 +308,38 @@ define(function(require){
             data.push(0);
             data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.measure), 5)); //Единица измерения 5B
             data.push(0);
-            return data;
+
+            if (anItem.discount)
+            {
+                data = data.concat(Utils.completeData(Utils.stringToBytes("11"), 2)); //Тип реквизита 2B
+                data.push(0);
+                data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("11", anItem.discount_type ? 1 : 0, 1, 0, 1)), 4)); //Флаги реквизита 4B
+                data.push(0);
+                data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+                data.push(0);
+                data = data.concat(Utils.completeData(Utils.stringToBytes(aLine++), 3)); //Смещение по вертикали 3B
+                data.push(0);
+                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.department), 2)); //Номер отдела, секции 2B
+                data.push(0);
+                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.code), 6)); //Код товара 6B
+                data.push(0);
+                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.discount), 5)); //Процентная скидка, надбавка 5B
+                data.push(0);
+                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.quantity), 11)); //Количество 11B
+                data.push(0);
+                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.cost), 11)); //Цена услуги 11B
+                data.push(0);
+                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.measure), 5)); //Единица измерения 5B
+                data.push(0);
+            }
+            return [data, aLine];
         }
 
-        function addReq(aReq, aLine, aValue) {
+        function addReq(aReq, aLine, aValue, aFlags) {
             var data = [];
             data = data.concat(Utils.completeData(Utils.stringToBytes(aReq.code), 2)); //Тип реквизита 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(aReq.code, 0, 1)), 4)); //Флаги реквизита 4B
+            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(aReq.code, aFlags ? aFlags : (aReq.flag ? aReq.flag : 0), 1, 0, 1)), 4)); //Флаги реквизита 4B
             data.push(0);
             data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
             data.push(0);
@@ -326,8 +353,8 @@ define(function(require){
 
         function addFiscalHead(r, i, anOperationType) {
             switch(anOperationType){
-                case "sell" : anOperationType = 0; break;
-                case "refund" : anOperationType = 1; r -= 2; break;
+                case "sell" : anOperationType = 0; r += 2; break;
+                case "refund" : anOperationType = 1;  break;
             }
 
             var data = [];
@@ -338,32 +365,68 @@ define(function(require){
             data.push(0);
             data = data.concat(Utils.stringToBytes(Utils.intToString(Utils.generateDocumentFlags('close'), 2))); //Флаги документа 2B
             data.push(0);
-            data = data.concat(Utils.stringToBytes(Utils.intToString(r - 1 + i * 2, 3))); //Количество реквизитов 3B
+            data = data.concat(Utils.stringToBytes(Utils.intToString(r + i, 3))); //Количество реквизитов 3B
             data.push(0);
             return data;
         }
 
+        function calcOrderReqs(anOrder){
+            var count = 0;
+            if (anOrder.total_discount){
+                count++;
+            }
+            for (var item of anOrder.items){
+                if (item.caption){
+                    count++;
+                }
+                if (item.discount){
+                    count++
+                }
+                count++;
+            }
+            return count;
+        }
+
         function fiscal(anOrder, aType){
             var data = [];
-            var documentFlags = Utils.generateDocumentFlags('close');
-            var Reqs = Requisites.getReqs('required', true);
+            var beginReqs = Requisites.getBeginReqs();
+            var endReqs = Requisites.getEndReqs();
+            var Reqs = Requisites.getReqs();
             var stroka = 0;
 
-            data = data.concat(addFiscalHead(Reqs.length, anOrder.items.length, aType));
+            data = data.concat(addFiscalHead(beginReqs.length + endReqs.length + 1, calcOrderReqs(anOrder), aType));
 
-            for (var Req of Reqs) {
-                if (aType == "refund" && (Req.code == "13" || Req.code == "14")){
-                    continue;
-                }
-                if (Req.code == "11") {
-                    for (var item of anOrder.items) {
-                        data = data.concat(addItem(item, stroka++));
-                        stroka++;
-                    }
-                } else {
-                    data = data.concat(addReq(Req, stroka++, Req.code == "13" ? anOrder.money : null));
-                }
+            //Заголовочная часть
+            for (var Req of beginReqs) {
+                data = data.concat(addReq(Req, stroka++));
             }
+
+            //Обработка товаров
+            for(var item of anOrder.items){
+                var result = addItem(item, stroka);
+                data = data.concat(result[0]);
+                stroka = result[1];
+            }
+
+            //Скидка на весь чек
+            if (anOrder.total_discount) {
+                data = data.concat(addReq(Reqs.total_discount, stroka++, anOrder.total_discount, anOrder.total_discount_type ? 1 : 0));
+            }
+
+            //Итоговая сумма
+            data = data.concat(addReq(Reqs.total, stroka++));
+
+            //Оплаченная сумма и сдача
+            if (aType == "sell"){
+                data = data.concat(addReq(Reqs.money, stroka++, anOrder.money));
+                data = data.concat(addReq(Reqs.cashback, stroka++));
+            }
+
+            //Футер чека
+            for (var Req of endReqs) {
+                data = data.concat(addReq(Req, stroka++));
+            }
+
 
             data = Utils.prepare(data);
             Utils.print(data);

@@ -38,8 +38,13 @@ QUnit.test( "Sell", function( assert ) {
             cost: "16",
             measure: "КГ",
             caption: "Огурцы"
+            ,
+            discount_type: 1
         }],
         money : "1000"
+        ,
+        total_discount: "5",
+        total_discount_type : 1
     };
 
     var event = {
@@ -55,13 +60,13 @@ QUnit.test( "Sell", function( assert ) {
 
     window.addEventListener("go", function(evt) {
         console.log(evt);
-        assert.ok( false, "Продажа прошла" );
+        assert.notOk(evt.detail, "Продажа прошла" );
         done();
     });
 });
 
 
-QUnit.test( "Sell", function( assert ) {
+QUnit.test( "Refund", function( assert ) {
     var done = assert.async();
 
     var order = {
@@ -89,7 +94,7 @@ QUnit.test( "Sell", function( assert ) {
 
     window.addEventListener("go", function(evt) {
         console.log(evt);
-        assert.ok( false, "Возврат прошел" );
+        assert.notOk( evt.detail, "Возврат прошел" );
         done();
     });
 });

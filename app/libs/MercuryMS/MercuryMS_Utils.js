@@ -145,9 +145,6 @@ define(function (require) {
         self.generateReqFlag = function (aType, aSpec, anUseDefaultFont, aPack, aDiscount, aTaxGroup, aSmallFont, aDoubleWidthFont, aDoubleHeightFont, aNotPrint) {
             var result = 0;
             var specialBits = typeof aSpec === 'number' ? aSpec : 0;
-            if (aType == "11"){
-                specialBits = 2;
-            }
             var defaultFont = anUseDefaultFont ? 1 : 0;                                     //1 - игнорировать настройки и использовать стандартный шрифт
             var pack = aPack && aType == '11' ? 1 : 0;                                      //1 - Если это упаковка(только для "Цена услуги" - 11)
             var discount = aDiscount ? 1 : 0;                                               //1 - если скидка, 0 - если надбавка
