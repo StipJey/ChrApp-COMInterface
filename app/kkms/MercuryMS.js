@@ -9,12 +9,8 @@ define(function(require){
     var Requisites = require('../libs/MercuryMS/MercuryMS_Requisites');
 
     function MercuryMS() {
-        var stx = 2;
-        var etx = 3;
-        var passwordData = [48, 48, 48, 48];
         var password = "0000";
 
-        //Служебный код. Требует рефакторинга
         var current_buffer = [];
 
         function rHandler(buf) {
@@ -143,19 +139,6 @@ define(function(require){
             }
         };
 
-        this.getPassword = function () {
-            return password;
-        };
-
-        this.setPassword = function (aValue) {
-            if (aValue.length == 4) {
-                password = aValue;
-                passwordData = Utils.stringToBytes(password);
-                //TO DO call KKM
-            }
-            throw "Пароль должен содержать 4 символа.";
-        };
-
         this.openSession = function (aParams) { //открытие смены
             var aNumber = aParams.number;
             var aFamily = aParams.family;
@@ -190,47 +173,6 @@ define(function(require){
             }
         };
 
-        function checkResponse(aData, aMessageType) {
-            if (aData && aData.length > 0) {
-                if (aData[0] == stx && aData[aData.length - 1] == etx) {
-                    if (aData[1] == aMessageType) {
-                        if (Utils.checkBCC(aData)) {
-                            return "";
-                        } else {
-                            return "Неверная контрольная сумма в ответе.";
-                        }
-                    } else {
-                        return "Неверный тип сообщения в ответе.";
-                    }
-                } else {
-                    return "Неверный формат ответа.";
-                }
-            } else {
-                return "Нет данных ответа."
-            }
-        }
-
-        function registerCashierResponse(aData, aCallback) {
-            var error = checkResponse(aData, 49)
-            var result = {};
-            if (!error) {
-                var resultCode = Utils.getInt(aData, 7, 4);
-                if (!resultCode) {
-                    result.error = errors.getErrorDescription(resultCode);
-                } else {
-                    result.code = resultCode;
-                    result.message = errors.getErrorDescription(resultCode);
-                    result.kkmStatus = Utils.getInt(aData, 2, 4);
-                    result.printerStatus = Utils.getInt(aData, 12, 2);
-                }
-            } else {
-                result.error = error;
-            }
-            if (aCallback) {
-                aCallback(result);
-            }
-        }
-
         this.closeSession = function (aFlags, aCallback) {//Закрытие смены
             var flags = aFlags ? aFlags : new Utils.generateReportFlags(0, 0, 1, 0, 0);
             getReport(48, flags, 0, aCallback);
@@ -260,7 +202,7 @@ define(function(require){
                     data.push(0);
                     data = Utils.prepare(data);
                     Utils.print(data);
-                    serial.send(Utils.convertArrayToBuffer(data), getReportResponse, aCallback);
+                    serial.send(Utils.convertArrayToBuffer(data));
                 } else {
                     if (aCallback) {
                         aCallback({
@@ -274,30 +216,6 @@ define(function(require){
                         result: "Неверный тип отчета " + aType
                     });
                 }
-            }
-        }
-
-        function getReportResponse(aData, aCallback) {
-            var error = checkResponse(aData, 95);
-            var result = {};
-            if (!error) {
-                var resultCode = Utils.getInt(aData, 7, 4);
-                if (!resultCode) {
-                    result.error = errors.getErrorDescription(resultCode);
-                } else {
-                    result.code = resultCode;
-                    result.message = errors.getErrorDescription(resultCode);
-                    result.kkmStatus = Utils.getInt(aData, 2, 4);
-                    result.printerStatus = Utils.getInt(aData, 12, 2);
-                    result.kkmSerialNum = Utils.getString(aData, 15, 7);
-                    result.reportNum = Utils.getInt(aData, 23, 5);
-                    result.sum = Utils.getFloat(aData, 29, 15);
-                }
-            } else {
-                result.error = error;
-            }
-            if (aCallback) {
-                aCallback(result);
             }
         }
 
@@ -317,7 +235,6 @@ define(function(require){
             Utils.print([27, 27]);
             serial.send([27, 27], null, aCallback);
         };
-
 
         function addItem(anItem, aLine) {
             var data = [];
