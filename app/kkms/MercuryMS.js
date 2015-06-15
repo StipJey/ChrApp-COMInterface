@@ -21,9 +21,6 @@ define(function(require){
             var bufView = new Uint8Array(buf);
             for (var i = 0; i < bufView.length; i++) {
                 current_buffer[current_buffer.length] = bufView[i];
-                console.log("!!!HANDLER!!!");
-                console.log(i);
-                console.log(current_buffer);
             }
             if (current_buffer[current_buffer.length - 1] == 3) {
                 var indexFirst = 0;
@@ -35,18 +32,37 @@ define(function(require){
                     index++;
                 });
                 current_buffer.splice(0, indexFirst);
-                console.log("HANDLER_OUT");
-                console.log(current_buffer);
-                CheckSellResponce(current_buffer);
+                CheckResponce(current_buffer);
             }
         }
 
-        function CheckSellResponce(buf) {
-            if (buf.length == 19) {
-                console.log("CHECK RESPONCE");
-                console.log(buf);
-                var stx = buf[0];
-                var code = buf[1];
+        function CheckResponce(buf){
+            var stx = buf[0];
+            var code = buf[1];
+            var etx = buf[buf.length - 1];
+
+            if (stx == 2 && etx == 3){
+                switch (code){
+                    case 95 : //Ответ на отчет
+                        CheckReportResponce(buf);
+                        break;
+                    case 83 : //Ответ на фискальную операцию
+                        CheckSellResponce(buf);
+                        break;
+                    case 49 : //Ответ на регистрацию кассира
+                        CheckRegCashierResponce(buf);
+                        break;
+                    default : //Ответ на что-то другое или ошибка.
+
+                        break;
+                }
+            } else {
+
+            }
+        }
+
+        function CheckBasicResponce(buf){
+            if (buf.length >= 19) {
                 var separator = buf[2];
                 var statusKKM = Utils.bytesToHex(buf.slice(3, 7)); //4B
                 var separator2 = buf[7];
@@ -54,23 +70,52 @@ define(function(require){
                 var separator3 = buf[12];
                 var statusPrinter = Utils.bytesToHex(buf.slice(13, 15)); //2B
                 var separator4 = buf[15];
-                var BCC = Utils.bytesToHex(buf.slice(16, 18));
-                var etx = buf[18];
 
-                console.log("KKM status");
-                console.log(statusKKM);
-                console.log("result");
-                console.log(result);
-                AppAPI({result : result, method : "sell"},'go');
-                var error = errors.getErrorDescription(result);
-                console.log("Сообщение ККМ: " + error);
-                console.log("Printer status");
-                console.log(statusPrinter);
-                if (separator == 0 && separator2 == 0 && separator3 == 0 && separator4 == 0)
-                    console.log("Разделители на месте");
-                console.log("Контрольная сумма");
-                console.log(BCC);
-                console.log(buf);
+                if (separator == 0 && separator2 == 0 && separator3 == 0 && separator4 == 0){
+                    var error = errors.getErrorDescription(result);
+                    return {
+                        statusKKM : statusKKM,
+                        statusPrinter : statusPrinter,
+                        result : result,
+                        method : "sell",
+                        description : error
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        function CheckSellResponce(buf) {
+            var responce = CheckBasicResponce(buf);
+            if (responce){
+                responce.method = "sell";
+                AppAPI(responce,'go');
+            } else {
+                AppAPI({result : 9999, method : "sell", description : "Ошибка в ответе от устройства"},'go');
+            }
+        }
+
+        function CheckRegCashierResponce(buf){
+            var responce = CheckBasicResponce(buf);
+            if (responce){
+                responce.method = "openSession";
+                AppAPI(responce,'go');
+            } else {
+                AppAPI({result : 9999, method : "openSession", description : "Ошибка в ответе от устройства"},'go');
+            }
+        }
+
+        function CheckReportResponce(buf){
+            var responce = CheckBasicResponce(buf);
+            if (responce){
+                responce.serialKKM = Utils.bytesToHex(buf.slice(16, 23));
+                responce.reportNumber = Utils.bytesToHex(buf.slice(24, 29));
+                responce.fiscalSum = Utils.bytesToHex(buf.slice(30, 45));
+                responce.method = "report";
+                AppAPI(responce,'go');
+            } else {
+                AppAPI({result : 9999, method : "report", description : "Ошибка в ответе от устройства"},'go');
             }
         }
 

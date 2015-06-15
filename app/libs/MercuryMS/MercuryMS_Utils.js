@@ -50,7 +50,7 @@ define(function (require) {
                 return aData;
             }
             return aData;
-        };
+        }
 
         function addTheZeros(aData, aNeedLength) {
             var data = [];
@@ -65,7 +65,7 @@ define(function (require) {
                 data.push(0);
             }
             return data;
-        };
+        }
 
         self.checkBCC = function (aData) {
             if (aData && aData.length > 0) {
