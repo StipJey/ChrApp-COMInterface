@@ -384,11 +384,27 @@ define(function(require){
             return [data, aLine];
         }
 
-        function addReq(aReq, aLine, aValue, aFlags) {
+        function addReq(aReq, aLine, aValue, aFlag, aFont) {
+            var flags, flag;
+
+            if (aFlag){
+                flag = aFlag;
+            } else {
+                flag = aReq.flag ? aReq.flag : 0;
+            }
+
+            if (aFont){
+                flags = Utils.generateReqFlag(aReq.code, flag, 0, 0, 1, 0, aFont.Small, aFont.dWidth, aFont.dHeight);
+            } else {
+                flags = Utils.generateReqFlag(aReq.code, flag, 1);
+            }
+
+
+
             var data = [];
             data = data.concat(Utils.stringToBytes(aReq.code, 2, "symbol")); //Тип реквизита 2B
             data.push(0);
-            data = data.concat(Utils.stringToBytes(Utils.generateReqFlag(aReq.code, aFlags ? aFlags : (aReq.flag ? aReq.flag : 0), 1, 0, 1), 4, "symbol")); //Флаги реквизита 4B
+            data = data.concat(Utils.stringToBytes(flags, 4, "symbol")); //Флаги реквизита 4B
             data.push(0);
             data = data.concat(Utils.stringToBytes(0, 2, "symbol")); //Смещение по горизонтали от начала строки 2B
             data.push(0);
@@ -450,6 +466,9 @@ define(function(require){
                 data = data.concat(addReq(Req, stroka++));
             }
 
+            //Пустая строка
+            stroka++;
+
             //Обработка товаров
             for(var item of anOrder.items){
                 var result = addItem(item, stroka);
@@ -463,7 +482,9 @@ define(function(require){
             }
 
             //Итоговая сумма
-            data = data.concat(addReq(Reqs.total, stroka++));
+            stroka++;
+            data = data.concat(addReq(Reqs.total, stroka++, null, null, {Small : true, dWidth : false, dHeight : true}));
+
 
             //Оплаченная сумма и сдача
             if (aType == "sell"){

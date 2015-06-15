@@ -156,7 +156,7 @@ define(function (require) {
             var specialBits = typeof aSpec === 'number' ? aSpec : 0;
             var defaultFont = anUseDefaultFont ? 1 : 0;                                     //1 - игнорировать настройки и использовать стандартный шрифт
             var pack = aPack && aType == '11' ? 1 : 0;                                      //1 - Если это упаковка(только для "Цена услуги" - 11)
-            var discount = aDiscount ? 1 : 0;                                               //1 - если скидка, 0 - если надбавка
+            var discount = typeof aDiscount === 'number' ? aDiscount : 1;                                       //1 - если скидка, 0 - если надбавка
             var taxGroup = aTaxGroup && (aType == '11' || aType == '21') ? aTaxGroup : 0;   //Для реквизита "Цена услуги", "Общая скидка/надбавка на чек" Налоговая группа от 0 до 4
             var font = aSmallFont ? 1 : 0;                                                  //0 - 14x30, 1 - 10x30
             var doubleWidth = aDoubleWidthFont ? 1 : 0;                                     //ДВойная ширина, 1 - вкл
