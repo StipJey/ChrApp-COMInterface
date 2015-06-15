@@ -8,7 +8,7 @@ define(function (require) {
     function Utils() {
         var self = this;
 
-        self.stringToBytes = function (aValue) {
+        self.stringToBytes = function (aValue, aNeedLength, aType) {
             if (aValue != 'undefined') {
                 var value = aValue.toString();
                 var len = value.length;
@@ -24,11 +24,20 @@ define(function (require) {
                         console.error("Недопустимый символ '" + value.charAt(i) + "'");
                     }
                 }
-                return data;
+                if (aNeedLength && aType){
+                    if (aType == "zero"){
+                        return addTheZeros(data, aNeedLength);
+                    }
+                    if (aType == "symbol"){
+                        return completeData(data, aNeedLength);
+                    }
+                } else {
+                    return data;
+                }
             } else return 0;
         };
 
-        self.completeData = function (aData, aNeedLength) {
+        function completeData(aData, aNeedLength) {
             if (typeof(aData) == "string") {
                 while (aData.length < aNeedLength) {
                     aData = "0" + aData;
@@ -43,7 +52,7 @@ define(function (require) {
             return aData;
         };
 
-        self.addTheZeros = function (aData, aNeedLength) {
+        function addTheZeros(aData, aNeedLength) {
             var data = [];
             if (aData) {
                 if (Array.isArray(aData)) {

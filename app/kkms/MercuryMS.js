@@ -61,7 +61,7 @@ define(function(require){
                 console.log(statusKKM);
                 console.log("result");
                 console.log(result);
-                AppAPI(result,'go');
+                AppAPI({result : result, method : "sell"},'go');
                 var error = errors.getErrorDescription(result);
                 console.log("Сообщение ККМ: " + error);
                 console.log("Printer status");
@@ -116,7 +116,7 @@ define(function(require){
                 if (aFamily && aFamily.length > 0 && aFamily.length < 41) {
                     var data = [];
                     data.push(49);
-                    data = data.concat(passwordData);
+                    data = data.concat(Utils.stringToBytes(password));
                     data.push(0);
                     data = data.concat(Utils.completeData(Utils.stringToBytes(aNumber.toString()), 2));
                     data.push(0);
@@ -201,13 +201,13 @@ define(function(require){
                 if (aFlags) {
                     var data = [];
                     data.push(95);
-                    data = data.concat(passwordData);
+                    data = data.concat(Utils.stringToBytes(password));
                     data.push(0);
                     data.push(aType);
                     data.push(0);
                     data = data.concat(Utils.stringToBytes(aFlags.getByte().toString(16).toUpperCase()));
                     data.push(0);
-                    data = data.concat(Utils.completeData(Utils.stringToBytes(aCashier.toString()), 2));
+                    data = data.concat(Utils.stringToBytes(aCashier.toString(), 2, "symbol"));
                     data.push(0);
                     data = Utils.prepare(data);
                     Utils.print(data);
@@ -255,7 +255,7 @@ define(function(require){
         this.printData = function (aText, aCallback) {
             var data = [];
             data.push(54);
-            data = data.concat(passwordData);
+            data = data.concat(Utils.stringToBytes(password));
             data.push(0);
             data = Utils.prepare(data);
             Utils.print(data);
@@ -275,61 +275,61 @@ define(function(require){
 
             if (anItem.caption)
             {
-                data = data.concat(Utils.completeData(Utils.stringToBytes("99"), 2)); //Тип реквизита 2B
+                data = data.concat(Utils.stringToBytes("99", 2, "symbol")); //Тип реквизита 2B
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("99", 0, 1)), 4)); //Флаги реквизита 4B
+                data = data.concat(Utils.stringToBytes(Utils.generateReqFlag("99", 0, 1), 4, "symbol")); //Флаги реквизита 4B
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+                data = data.concat(Utils.stringToBytes(0, 2, "symbol")); //Смещение по горизонтали от начала строки 2B
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(aLine++), 3)); //Смещение по вертикали 3B
+                data = data.concat(Utils.stringToBytes(aLine++, 3, "symbol")); //Смещение по вертикали 3B
                 data.push(0);
                 data = data.concat([0, 0, 0, 0, 0]);
-                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.caption), 40)); //Сам реквизит 40B
+                data = data.concat(Utils.stringToBytes(anItem.caption, 40, "zero")); //Сам реквизит 40B
                 data.push(0);
             }
 
-            data = data.concat(Utils.completeData(Utils.stringToBytes("11"), 2)); //Тип реквизита 2B
+            data = data.concat(Utils.stringToBytes("11", 2, "symbol")); //Тип реквизита 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("11", 2, 1)), 4)); //Флаги реквизита 4B
+            data = data.concat(Utils.stringToBytes(Utils.generateReqFlag("11", 2, 1), 4, "symbol")); //Флаги реквизита 4B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+            data = data.concat(Utils.stringToBytes(0, 2, "symbol")); //Смещение по горизонтали от начала строки 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine++), 3)); //Смещение по вертикали 3B
+            data = data.concat(Utils.stringToBytes(aLine++,3, "symbol")); //Смещение по вертикали 3B
             data.push(0);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.department), 2)); //Номер отдела, секции 2B
+            data = data.concat(Utils.stringToBytes(anItem.department, 2, "zero")); //Номер отдела, секции 2B
             data.push(0);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.code), 6)); //Код товара 6B
+            data = data.concat(Utils.stringToBytes(anItem.code, 6, "zero")); //Код товара 6B
             data.push(0);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.discount ? anItem.discount : 0), 5)); //Процентная скидка, надбавка 5B
+            data = data.concat(Utils.stringToBytes(anItem.discount ? anItem.discount : 0, 5, "zero")); //Процентная скидка, надбавка 5B
             data.push(0);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.quantity), 11)); //Количество 11B
+            data = data.concat(Utils.stringToBytes(anItem.quantity, 11, "zero")); //Количество 11B
             data.push(0);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.cost), 11)); //Цена услуги 11B
+            data = data.concat(Utils.stringToBytes(anItem.cost, 11, "zero")); //Цена услуги 11B
             data.push(0);
-            data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.measure), 5)); //Единица измерения 5B
+            data = data.concat(Utils.stringToBytes(anItem.measure, 5, "zero")); //Единица измерения 5B
             data.push(0);
 
             if (anItem.discount)
             {
-                data = data.concat(Utils.completeData(Utils.stringToBytes("11"), 2)); //Тип реквизита 2B
+                data = data.concat(Utils.stringToBytes("11", 2, "symbol")); //Тип реквизита 2B
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag("11", anItem.discount_type ? 1 : 0, 1, 0, 1)), 4)); //Флаги реквизита 4B
+                data = data.concat(Utils.stringToBytes(Utils.generateReqFlag("11", anItem.discount_type ? 1 : 0, 1, 0, 1), 4, "symbol")); //Флаги реквизита 4B
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+                data = data.concat(Utils.stringToBytes(0, 2, "symbol")); //Смещение по горизонтали от начала строки 2B
                 data.push(0);
-                data = data.concat(Utils.completeData(Utils.stringToBytes(aLine++), 3)); //Смещение по вертикали 3B
+                data = data.concat(Utils.stringToBytes(aLine++, 3, "symbol")); //Смещение по вертикали 3B
                 data.push(0);
-                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.department), 2)); //Номер отдела, секции 2B
+                data = data.concat(Utils.stringToBytes(anItem.department, 2, "zero")); //Номер отдела, секции 2B
                 data.push(0);
-                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.code), 6)); //Код товара 6B
+                data = data.concat(Utils.stringToBytes(anItem.code, 6, "zero")); //Код товара 6B
                 data.push(0);
-                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.discount), 5)); //Процентная скидка, надбавка 5B
+                data = data.concat(Utils.stringToBytes(anItem.discount, 5, "zero")); //Процентная скидка, надбавка 5B
                 data.push(0);
-                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.quantity), 11)); //Количество 11B
+                data = data.concat(Utils.stringToBytes(anItem.quantity, 11, "zero")); //Количество 11B
                 data.push(0);
-                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.cost), 11)); //Цена услуги 11B
+                data = data.concat(Utils.stringToBytes(anItem.cost, 11, "zero")); //Цена услуги 11B
                 data.push(0);
-                data = data.concat(Utils.addTheZeros(Utils.stringToBytes(anItem.measure), 5)); //Единица измерения 5B
+                data = data.concat(Utils.stringToBytes(anItem.measure, 5, "zero")); //Единица измерения 5B
                 data.push(0);
             }
             return [data, aLine];
@@ -337,16 +337,16 @@ define(function(require){
 
         function addReq(aReq, aLine, aValue, aFlags) {
             var data = [];
-            data = data.concat(Utils.completeData(Utils.stringToBytes(aReq.code), 2)); //Тип реквизита 2B
+            data = data.concat(Utils.stringToBytes(aReq.code, 2, "symbol")); //Тип реквизита 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(Utils.generateReqFlag(aReq.code, aFlags ? aFlags : (aReq.flag ? aReq.flag : 0), 1, 0, 1)), 4)); //Флаги реквизита 4B
+            data = data.concat(Utils.stringToBytes(Utils.generateReqFlag(aReq.code, aFlags ? aFlags : (aReq.flag ? aReq.flag : 0), 1, 0, 1), 4, "symbol")); //Флаги реквизита 4B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(0), 2)); //Смещение по горизонтали от начала строки 2B
+            data = data.concat(Utils.stringToBytes(0, 2, "symbol")); //Смещение по горизонтали от начала строки 2B
             data.push(0);
-            data = data.concat(Utils.completeData(Utils.stringToBytes(aLine), 3)); //Смещение по вертикали 3B
+            data = data.concat(Utils.stringToBytes(aLine, 3, "symbol")); //Смещение по вертикали 3B
             data.push(0);
             data = data.concat([0, 0, 0, 0, 0]);
-            data = data.concat(Utils.addTheZeros(aValue ? Utils.stringToBytes(aValue) : 0, 40)); //Сам реквизит 40B
+            data = data.concat(Utils.stringToBytes(aValue ? aValue : 0, 40, "zero")); //Сам реквизит 40B
             data.push(0);
             return data;
         }
@@ -359,7 +359,7 @@ define(function(require){
 
             var data = [];
             data.push(83); //0x53
-            data = data.concat(Utils.completeData(passwordData, 4)); //4B
+            data = data.concat(Utils.stringToBytes(password, 4, "symbol")); //4B
             data.push(0);
             data = data.concat(Utils.stringToBytes(anOperationType)); //Тип операции
             data.push(0);
