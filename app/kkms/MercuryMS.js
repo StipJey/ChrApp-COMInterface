@@ -167,9 +167,9 @@ define(function(require){
                     data.push(49);
                     data = data.concat(Utils.stringToBytes(password));
                     data.push(0);
-                    data = data.concat(Utils.completeData(Utils.stringToBytes(aNumber.toString()), 2));
+                    data = data.concat(Utils.stringToBytes(aNumber.toString(), 2, "symbol"));
                     data.push(0);
-                    data = data.concat(Utils.completeData(Utils.stringToBytes(aFamily), 40));
+                    data = data.concat(Utils.stringToBytes(aFamily, 40, "zero"));
                     data.push(0);
                     data = Utils.prepare(data);
                     Utils.print(data);
@@ -231,7 +231,7 @@ define(function(require){
             }
         }
 
-        this.getReportZ = function (aFlags, aCallback) {//Закрытие смены
+        this.closeSession = function (aFlags, aCallback) {//Закрытие смены
             var flags = aFlags ? aFlags : new Utils.generateReportFlags(0, 0, 1, 0, 0);
             getReport(48, flags, 0, aCallback);
         };
