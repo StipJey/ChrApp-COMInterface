@@ -131,9 +131,13 @@ define(function(require){
         var serial = this.connection;
         serial.recieveHandler = rHandler;
 
+         var onConnect = function(){
+            AppAPI(true,'connectTo');
+        };
+
         this.connect = function (aPath) {
             if (aPath) {
-                this.connection.connect(aPath);
+                this.connection.connect(aPath, onConnect);
             } else {
                 this.connection.connect(this.options.devicePath);
             }

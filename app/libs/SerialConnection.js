@@ -9,7 +9,7 @@ var SerialConnection = function(aOptions) {
   this.lineBuffer = "";
   this.boundOnReceive = this.onReceive.bind(this);
   this.boundOnReceiveError = this.onReceiveError.bind(this);
-  this.onConnect = new chrome.Event();
+  this.onConnect = function (){};
   this.onReadLine = new chrome.Event();
   this.onError = new chrome.Event();
 };
@@ -22,7 +22,7 @@ SerialConnection.prototype.onConnectComplete = function(connectionInfo) {
   this.connectionId = connectionInfo.connectionId;
   serial.onReceive.addListener(this.boundOnReceive);
   serial.onReceiveError.addListener(this.boundOnReceiveError);
-  this.onConnect.dispatch();
+  this.onConnect();
 };
 
 SerialConnection.prototype.onReceive = function(receiveInfo) {
@@ -43,7 +43,8 @@ SerialConnection.prototype.getDevices = function(callback) {
   serial.getDevices(callback);
 };
 
-SerialConnection.prototype.connect = function(path) {
+SerialConnection.prototype.connect = function(path, callback) {
+  this.onConnect = callback;
   serial.connect(path ? path : this.options.path, this.options, this.onConnectComplete.bind(this));
 };
 
