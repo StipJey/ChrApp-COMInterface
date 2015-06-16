@@ -23,6 +23,54 @@ QUnit.test( "Подключение", function( assert ) {
     });
 });
 
+QUnit.test("Установка пароля", function( assert ) {
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "setPassword",
+            params : "0000"
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+        console.log(evt);
+        assert.equal(evt.detail.result, event.data.params, "пароль установлен" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
+
+QUnit.test("Запрос пароля из памяти", function( assert ) {
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "getPassword",
+            params : null
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+        console.log(evt);
+        assert.ok(evt.detail.result, "Пароль получен" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
+
 QUnit.test("Регистрация кассира", function( assert ) {
     var done = assert.async();
 
@@ -201,6 +249,55 @@ QUnit.test("Возврат товара", function( assert ) {
     var listener = function(evt) {
         console.log(evt);
         assert.notOk(evt.detail.result, "Возврат прошел" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
+
+QUnit.test("Отчет X", function(assert){
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "getCashierReport",
+            params : null
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Отчет Х" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
+
+QUnit.test("Отчет X", function(assert){
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "getSummaryReport",
+            params : null
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Отчет Х" );
         done();
         window.removeEventListener("go", listener);
     }

@@ -8,11 +8,57 @@ define(function(require){
     var errors = require('../libs/MercuryMS/MercuryMS_Errors');
     var Requisites = require('../libs/MercuryMS/MercuryMS_Requisites');
 
-    function MercuryMS() {
+    function MercuryMS(anAlias) {
+        //begin Initialization
         var password = "0000";
-
+        getPassword();
+        var alias = anAlias;
         var current_buffer = [];
+        this.options = {
+            bufferSize: 4096,
+            bitrate: 9600,
+            dataBits: "eight",
+            parityBit: "no",
+            stopBits: "one"
+        };
+        this.connection = new SerialConnection(this.options);
+        var serial = this.connection;
+        serial.recieveHandler = rHandler;
+        //end initialization
 
+        //begin Функции с Chrome App API
+        function getPassword(){
+            chrome.storage.local.get('password', function(aPassword){
+                password = aPassword.password[alias];
+            });
+        }
+
+        this.getPassword = function(){
+            chrome.storage.local.get('password', function(aPassword){
+                var responce = {
+                        result : aPassword.password[alias],
+                        alias : alias,
+                        method : "getPassword"
+                    };
+                AppAPI(responce,"go")
+            });
+        };
+
+        this.setPassword = function(aPass){
+            var obj = {password : {}};
+            obj.password[alias] = aPass;
+            chrome.storage.local.set(obj, function (){
+                var responce = {
+                    alias : alias,
+                    method : "setPassword",
+                    result : aPass
+                };
+                AppAPI(responce,'go');
+            })
+        };
+        //end Функции с Chrome App API
+
+        //Обработчики ответов
         function rHandler(buf) {
             var bufView = new Uint8Array(buf);
             for (var i = 0; i < bufView.length; i++) {
@@ -86,9 +132,10 @@ define(function(require){
             var responce = CheckBasicResponce(buf);
             if (responce){
                 responce.method = "sell";
+                responce.alias = alias;
                 AppAPI(responce,'go');
             } else {
-                AppAPI({result : 9999, method : "sell", description : "Ошибка в ответе от устройства"},'go');
+                AppAPI({result : 9999, method : "sell", alias : alias, description : "Ошибка в ответе от устройства"},'go');
             }
         }
 
@@ -96,39 +143,33 @@ define(function(require){
             var responce = CheckBasicResponce(buf);
             if (responce){
                 responce.method = "openSession";
+                responce.alias = alias;
                 AppAPI(responce,'go');
             } else {
-                AppAPI({result : 9999, method : "openSession", description : "Ошибка в ответе от устройства"},'go');
+                AppAPI({result : 9999, method : "openSession", alias : alias, description : "Ошибка в ответе от устройства"},'go');
             }
         }
 
         function CheckReportResponce(buf){
             var responce = CheckBasicResponce(buf);
             if (responce){
-                responce.serialKKM = Utils.bytesToHex(buf.slice(16, 23));
-                responce.reportNumber = Utils.bytesToHex(buf.slice(24, 29));
-                responce.fiscalSum = Utils.bytesToHex(buf.slice(30, 45));
+                responce.serialKKM = Utils.bytesToHex(buf.slice(16, 23)).toString(16);
+                responce.reportNumber = Utils.bytesToHex(buf.slice(24, 29)).toString(16);
+                responce.fiscalSum = Utils.bytesToHex(buf.slice(30, 45)).toString(16);
                 responce.method = "report";
+                responce.alias = alias;
                 AppAPI(responce,'go');
             } else {
-                AppAPI({result : 9999, method : "report", description : "Ошибка в ответе от устройства"},'go');
+                AppAPI({result : 9999, method : "report", alias : alias, description : "Ошибка в ответе от устройства"},'go');
             }
         }
 
-        this.options = {
-            bufferSize: 4096,
-            bitrate: 9600,
-            dataBits: "eight",
-            parityBit: "no",
-            stopBits: "one"
-        };
-
-        this.connection = new SerialConnection(this.options);
-        var serial = this.connection;
-        serial.recieveHandler = rHandler;
-
-         var onConnect = function(){
-            AppAPI(true,'connectTo');
+        var onConnect = function(){
+             var responce = {
+                 alias : alias,
+                 result : true
+             };
+             AppAPI(responce,'connectTo');
         };
 
         this.connect = function (aPath) {
@@ -139,50 +180,25 @@ define(function(require){
             }
         };
 
-        this.openSession = function (aParams) { //открытие смены
-            var aNumber = aParams.number;
-            var aFamily = aParams.family;
-            var aCallback = aParams.callback;
-
-            if (aNumber < 100 && aNumber > -1) {
-                if (aFamily && aFamily.length > 0 && aFamily.length < 41) {
-                    var data = [];
-                    data.push(49);
-                    data = data.concat(Utils.stringToBytes(password));
-                    data.push(0);
-                    data = data.concat(Utils.stringToBytes(aNumber.toString(), 2, "symbol"));
-                    data.push(0);
-                    data = data.concat(Utils.stringToBytes(aFamily, 40, "zero"));
-                    data.push(0);
-                    data = Utils.prepare(data);
-                    Utils.print(data);
-                    serial.send(Utils.convertArrayToBuffer(data));
-                } else {
-                    if (aCallback) {
-                        aCallback({
-                            result: "Фамилия кассира должна быть не больше 40 символов и меньше 0"
-                        });
-                    }
-                }
-            } else {
-                if (aCallback) {
-                    aCallback({
-                        result: "Номер кассира не может быть больше 99 и меньше 0"
-                    });
-                }
+        //Для отладки
+        this.printData = function (aText, aCallback) {
+            var data = [];
+            data.push(54);
+            data = data.concat(Utils.stringToBytes(password));
+            data.push(0);
+            data = Utils.prepare(data);
+            Utils.print(data);
+            serial.send(data, null, aCallback);
+            var textBytes = Utils.stringToBytes(aText);
+            for (var i = 0; i < textBytes.length; i++) {
+                serial.send([textBytes[i]], null, aCallback);
+                Utils.print([textBytes[i]]);
             }
+            Utils.print([27, 27]);
+            serial.send([27, 27], null, aCallback);
         };
 
-        this.closeSession = function (aFlags, aCallback) {//Закрытие смены
-            var flags = aFlags ? aFlags : new Utils.generateReportFlags(0, 0, 1, 0, 0);
-            getReport(48, flags, 0, aCallback);
-        };
-
-        this.getReportX = function (aFlags, aCashier, aCallback) {//сводный
-            var flags = aFlags ? aFlags : new Utils.generateReportFlags();
-            getReport(48, flags, aCashier, aCallback);
-        };
-
+        //begin Приватные методы
         function getReport(aType, aFlags, aCashier, aCallback) {
             function checkType(aType) {
                 return aType && (aType == 48 || aType == 49 || aType == 50 || aType == 51);
@@ -196,7 +212,7 @@ define(function(require){
                     data.push(0);
                     data.push(aType);
                     data.push(0);
-                    data = data.concat(Utils.stringToBytes(aFlags.getByte().toString(16).toUpperCase()));
+                    data = data.concat(Utils.stringToBytes(aFlags, 2, "symbol"));
                     data.push(0);
                     data = data.concat(Utils.stringToBytes(aCashier.toString(), 2, "symbol"));
                     data.push(0);
@@ -218,23 +234,6 @@ define(function(require){
                 }
             }
         }
-
-        this.printData = function (aText, aCallback) {
-            var data = [];
-            data.push(54);
-            data = data.concat(Utils.stringToBytes(password));
-            data.push(0);
-            data = Utils.prepare(data);
-            Utils.print(data);
-            serial.send(data, null, aCallback);
-            var textBytes = Utils.stringToBytes(aText);
-            for (var i = 0; i < textBytes.length; i++) {
-                serial.send([textBytes[i]], null, aCallback);
-                Utils.print([textBytes[i]]);
-            }
-            Utils.print([27, 27]);
-            serial.send([27, 27], null, aCallback);
-        };
 
         function addItem(anItem, aLine) {
             var data = [];
@@ -419,6 +418,57 @@ define(function(require){
             Utils.print(data);
             serial.send(Utils.convertArrayToBuffer(data));
         }
+        //end Приватные методы
+
+        //begin Внешний интерфейс
+        this.openSession = function (aParams) { //открытие смены
+            var aNumber = aParams.number;
+            var aFamily = aParams.family;
+            var aCallback = aParams.callback;
+
+            if (aNumber < 100 && aNumber > -1) {
+                if (aFamily && aFamily.length > 0 && aFamily.length < 41) {
+                    var data = [];
+                    data.push(49);
+                    data = data.concat(Utils.stringToBytes(password));
+                    data.push(0);
+                    data = data.concat(Utils.stringToBytes(aNumber.toString(), 2, "symbol"));
+                    data.push(0);
+                    data = data.concat(Utils.stringToBytes(aFamily, 40, "zero"));
+                    data.push(0);
+                    data = Utils.prepare(data);
+                    Utils.print(data);
+                    serial.send(Utils.convertArrayToBuffer(data));
+                } else {
+                    if (aCallback) {
+                        aCallback({
+                            result: "Фамилия кассира должна быть не больше 40 символов и меньше 0"
+                        });
+                    }
+                }
+            } else {
+                if (aCallback) {
+                    aCallback({
+                        result: "Номер кассира не может быть больше 99 и меньше 0"
+                    });
+                }
+            }
+        };
+
+        this.closeSession = function (aFlags, aCallback) {//Закрытие смены
+            var flags = aFlags ? aFlags : new Utils.generateReportFlags(0, 0, 1, 0, 0);
+            getReport(48, flags, 0, aCallback);
+        };
+
+        this.getCashierReport = function (aFlags, aCashier, aCallback) {
+            var flags = aFlags ? aFlags : new Utils.generateReportFlags();
+            getReport(50, flags, aCashier ? aCashier : 0, aCallback);
+        };
+
+        this.getSummaryReport = function (aFlags, aCallback){
+            var flags = aFlags ? aFlags : new Utils.generateReportFlags();
+            getReport(49, flags, 0, aCallback);
+        }
 
         this.refund = function(anOrder){
             fiscal(anOrder, "refund");
@@ -427,6 +477,7 @@ define(function(require){
         this.sell = function (anOrder) {
             fiscal(anOrder, "sell");
         };
+        //end Внешний интерфейс
     }
 
     return MercuryMS;

@@ -183,21 +183,14 @@ define(function (require) {
             var all = aAll ? 1 : 0;
             var extended = aExtended ? 1 : 0;
 
-            this.getByte = function () {
-                var result = [];
-                for (var i = 0; i < result.length; i++) {
-                    result[i] = 0;
-                }
-                result[0] |= extended << 4;
-                result[0] |= all << 3;
-                result[0] |= full << 2;
-                result[0] |= sectionSum << 1;
-                result[0] |= cashierSum;
-                return result;
-            };
-
-            //return this.getByte();
-        }
+            var result = 0;
+            result |= extended << 4;
+            result |= all << 3;
+            result |= full << 2;
+            result |= sectionSum << 1;
+            result |= cashierSum;
+            return result.toString(16);
+        };
 
         self.convertArrayToBuffer = function (aData) {
             if (aData) {

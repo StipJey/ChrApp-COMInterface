@@ -22,7 +22,7 @@ define(['settings', 'AppAPI'], function(settings, AppAPI){
     function DeviceHandler(){
         this.devices = {};
         this.add = function(aDevice, anAlias){
-            this.devices[anAlias] = new aDevice();
+            this.devices[anAlias] = new aDevice(anAlias);
         }
     }
     
