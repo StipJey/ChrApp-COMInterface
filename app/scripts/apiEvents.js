@@ -37,7 +37,7 @@ define(function(require){
     document.addEventListener('getFunctions', function(event){
         var deviceData = event.detail;
         var output = [];
-        for (func in deviceHandler.devices[deviceData.alias]){
+        for (var func in deviceHandler.devices[deviceData.alias]){
             output.push(func);
         }
         AppAPI(output, 'getFunctions');
