@@ -1,4 +1,5 @@
-define(['settings', 'AppAPI'], function(settings, AppAPI){
+define(function(require){
+    var AppAPI = require('AppAPI');
     //var driversList = require('DriversList');
     //var driversReq = {};
     //for (type of driversList){
@@ -25,8 +26,7 @@ define(['settings', 'AppAPI'], function(settings, AppAPI){
             this.devices[anAlias] = new aDevice(anAlias);
         }
     }
-    
-    settings.getSettings('scale', scaleCallback);
+
 
     return DeviceHandler;
 

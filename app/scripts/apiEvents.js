@@ -16,7 +16,7 @@ define(function(require){
         var Connection = require('../libs/SerialConnection');
         var connection = new Connection();
         connection.getDevices(function(ports) {
-            AppAPI(ports, 'getDevices');
+            AppAPI(ports, 'getPorts');
         });
     });
 
@@ -49,7 +49,9 @@ define(function(require){
     });
 
     document.addEventListener('setSettings', function(event){
-        chrome.storage.local.set(event.detail);
+        chrome.storage.local.set(event.detail, function(){
+            AppAPI(true,'setSettings');
+        });
     });
 
     document.addEventListener('getSettings', function(event){

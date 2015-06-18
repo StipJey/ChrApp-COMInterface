@@ -1,5 +1,56 @@
 define(function(){
-    this.Devices = {
+    var Device = {
+        scales      :   {
+            display : "Весы",
+            values  : [{
+                name : "none"
+            }, {
+                name     :   "Mercury-315",
+                file     :   "../scales/Mercury315",
+                settings :  {
+                    port    :   {
+                        display :   "Порт",
+                        values  :   {}
+                    }
+                },
+                actions : [
+                    {
+                        display :   "Тест",
+                        command :   "test"
+                    }
+                ]
+            }, {
+                name     :   "SuperScale",
+                settings :  {
+                    port    :   {
+                        display :   "Порт",
+                        values  :   {}
+                    },
+                    weigth  :   {
+                        display : "Диапазон веса",
+                        values  : ["--", "0-20", "20-50", "50-150"]}
+                }
+            }]
+        },
+        printers    :   {
+            display : "Чековый принтер",
+            values  : [{
+                name : "none"
+            }, {
+                name     :   "Mercury MS",
+                file     :   "../kkms/MercuryMS",
+                settings :  {
+                    port    :   {
+                        display :   "Порт",
+                        values  :   {}
+                    }
+                }
+            }
+            ]
+        }
+    };
+
+    var Devices = {
         scale : {
             type : "scale", 
             type_rus : "Весы",
@@ -35,5 +86,5 @@ define(function(){
             }
         }
     };
-    return this.Devices;
+    return Device;
 });
