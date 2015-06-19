@@ -480,5 +480,8 @@ define(function(require){
         //end Внешний интерфейс
     }
 
+    MercuryMS.information = {
+        type : "printers"
+    };
     return MercuryMS;
 });

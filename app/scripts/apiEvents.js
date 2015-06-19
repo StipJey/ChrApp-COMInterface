@@ -8,8 +8,10 @@ define(function(require){
     });
 
     document.addEventListener('getDevices', function(){
-        var devices = require('DriversList');
-        AppAPI(devices, 'getDevices');
+        var driversList = new (require('DriversList'))();
+        driversList.getDevices(function(devs){
+            AppAPI(devs, 'getDevices');
+        });
     });
 
     document.addEventListener('getPorts', function(){
@@ -27,6 +29,10 @@ define(function(require){
             deviceHandler.devices[deviceData.alias].connect(deviceData.port);
         })
 
+    });
+
+    document.addEventListener('connectToSavedDevices', function(event){
+        deviceHandler.connectToSavedDevices();
     });
 
     document.addEventListener('isConnected', function(event){

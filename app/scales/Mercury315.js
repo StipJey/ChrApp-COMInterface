@@ -50,23 +50,11 @@ define(function(require){
                 this.connection.connect(this.options.devicePath);
             }
         };
-
-        this.getPortList = function(){
-            this.connection.getDevices(function(ports) {
-                for (var counter = 0; counter < 2; counter++ ){
-                    ports.push({path : "/dev/ttyS" + counter});
-                }
-                return ports;
-            });
-        };
-
-        this.setSerialOptions = function(aOptions) {
-            for (var j in aOptions)
-                this.options[j] = aOptions[j];
-        };
     }
 
-
+    Mercury315.information = {
+        type : "scales"
+    };
     return Mercury315;
 });
 
