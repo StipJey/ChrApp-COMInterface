@@ -11,7 +11,7 @@ define(function(require){
     function MercuryMS(anAlias) {
         //begin Initialization
         var password = "0000";
-        getPassword();
+        //getPassword();
         var alias = anAlias;
         var current_buffer = [];
         this.options = {
