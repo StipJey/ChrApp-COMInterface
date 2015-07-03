@@ -62,10 +62,11 @@ SerialConnection.prototype.send = function(bytes) {
   });
 };
 
-SerialConnection.prototype.disconnect = function() {
+SerialConnection.prototype.disconnect = function(aCallback) {
   if (this.connectionId < 0) {
     throw 'Invalid connection';
   }
+  serial.disconnect(this.connectionId, aCallback);
 };
 
   SerialConnection.prototype.receiveHandler = function(aData){

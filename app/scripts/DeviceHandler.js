@@ -31,7 +31,11 @@ define(function(require){
         };
 
         this.connect = function(anAlias, aPort){
-            this.devices[anAlias].connect(aPort);
+            if (this.devices[anAlias] && this.devices[anAlias].connect){
+                this.devices[anAlias].connect(aPort);
+            } else {
+                console.log("Ошибка драйвера " + anAlias);
+            }
         };
 
         this.connectToSavedDevices = function(){

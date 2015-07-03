@@ -179,6 +179,17 @@ define(function(require){
                 this.connection.connect(this.options.devicePath);
             }
         };
+        
+        this.disconnect = function (aCallback) {
+            if (aCallback){
+                this.connection.disconnect(aCallback);
+            } else {
+                this.connection.disconnect(function(){
+                    console.log("Disconnected");
+                });
+            }
+
+        };
 
         //Для отладки
         this.printData = function (aText, aCallback) {

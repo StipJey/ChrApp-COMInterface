@@ -28,7 +28,14 @@ define(function(require){
             deviceHandler.add(dev, deviceData.alias);
             deviceHandler.devices[deviceData.alias].connect(deviceData.port);
         })
-
+    });
+    
+    document.addEventListener('disconnect', function(event){
+        var deviceData = event.detail;
+        require([deviceData.file], function(dev){
+            deviceHandler.add(dev, deviceData.alias);
+            deviceHandler.devices[deviceData.alias].disconnect(deviceData.port);
+        })
     });
 
     document.addEventListener('connectToSavedDevices', function(event){
