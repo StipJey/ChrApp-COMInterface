@@ -188,7 +188,6 @@ define(function(require){
                     console.log("Disconnected");
                 });
             }
-
         };
 
         //Для отладки
