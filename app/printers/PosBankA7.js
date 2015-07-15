@@ -35,6 +35,7 @@ define(function(require) {
                 });
                 current_buffer.splice(0, indexFirst);
                 //CheckResponce(current_buffer);
+                CheckSellResponce(current_buffer);
             }
         }
 
@@ -87,16 +88,6 @@ define(function(require) {
         this.sell = function (anOrder) {
             var data = [];
 
-            //data = data.concat([27, 69, 48, 27, 45, 48, 27, 33, 0, 29, 66, 48, 27, 97, 48, 27, 51, 60, 27, 71, 49]);
-            //data = data.concat(Utils.stringToBytes("0 Сосисочка молочная"));
-            ////data = data.concat([9, 10]);
-            //data = data.concat([27,97,50]);
-            //data = data.concat(Utils.stringToBytes("500"));
-            //data = data.concat([9, 10]);
-            //data = data.concat([27, 69, 48, 27, 45, 48, 27, 33, 185, 29, 66, 48, 27, 97, 48, 27, 51, 60]);
-            //data = data.concat([10, 10, 10, 10, 10]);
-            //data = data.concat([27, 109]);
-
             data = data.concat(getHeader());
             data = data.concat(createBody(anOrder));
             data = data.concat([10, 10, 10, 10, 10]);
@@ -104,6 +95,18 @@ define(function(require) {
 
             serial.send(Utils.convertArrayToBuffer(data));
         };
+
+        function CheckSellResponce(buf) {
+            //var responce = CheckBasicResponce(buf);
+            var responce = {result : true};
+            if (responce){
+                responce.method = "sell";
+                responce.alias = alias;
+                AppAPI(responce,'go');
+            } else {
+                AppAPI({result : 9999, method : "sell", alias : alias, description : "Ошибка в ответе от устройства"},'go');
+            }
+        }
 
         function createBody(anOrder){
             var sum = 0;
@@ -122,31 +125,24 @@ define(function(require) {
 
             //Скидка на весь чек
             if (anOrder.total_discount) {
-                data = data.concat(Utils.printLine("Общая скидка на чек", "left", 17));
-                data = data.concat(Utils.printLine(anOrder.total_discount, "right", 16));
+                data = data.concat(Utils.printBundle("Общая скидка на чек", (-anOrder.total_discount).toFixed(2)));
+                sum -= +anOrder.total_discount;
             }
 
             data = data.concat(Utils.printLine("=========================================="))
+
             //Итоговая сумма
-            //data = data.concat(Utils.printLine("ИТОГ", "left", 176));
-            //data = data.concat(Utils.printLine(sum, "right", 176));
             data = data.concat(Utils.printBundle("ИТОГ", (+sum).toFixed(2), 176));
 
 
             //Оплаченная сумма и сдача
-            //data = data.concat(Utils.printLine("Наличными", "left", 17));
-            //data = data.concat(Utils.printLine(anOrder.money, "right", 17));
             data = data.concat(Utils.printBundle("Наличными", (+anOrder.money).toFixed(2), 17));
-            //data = data.concat(Utils.printLine("Сдача", "left", 16));
-            //data = data.concat(Utils.printLine(sum - anOrder.money, "right", 16));
             data = data.concat(Utils.printBundle("Сдача", (+sum - +anOrder.money).toFixed(2), 16));
             return data;
         }
 
         function addItem(anItem) {
-            var data = [];
-            //data = data.concat(Utils.printLine(anItem.caption));
-            //data = data.concat(Utils.printLine(anItem.cost + " x " + anItem.quantity + " " + anItem.measure + "  =" + (anItem.cost * anItem.quantity), "right"));
+            var data;
             data = Utils.printBundle(anItem.caption, (+anItem.cost).toFixed(2) + " x " + anItem.quantity + " " + anItem.measure + "  =" + (+anItem.cost * +anItem.quantity).toFixed(2));
             if (anItem.discount){
                 data = data.concat(Utils.printBundle("Скидка " + anItem.discount + "% ",  "  -" + (+anItem.cost * +anItem.quantity * +anItem.discount / 100).toFixed(2)));
@@ -164,10 +160,7 @@ define(function(require) {
             data = data.concat(Utils.printLine(reqs.firm, "center", 16));
             data = data.concat([9, 10]);
             data = data.concat(Utils.printBundle(new Date().toLocaleDateString("ru", {year: 'numeric',month: 'numeric',day: 'numeric',hour: 'numeric',minute: 'numeric'}),"Кассир " + reqs.cashier));
-            //data = data.concat(Utils.printLine("ИНН " + reqs.INN, "right"));
-            //data = data.concat(Utils.printLine(new Date().toLocaleDateString("ru", {year: 'numeric',month: 'numeric',day: 'numeric',hour: 'numeric',minute: 'numeric'}), "left"));
             data = data.concat(Utils.printLine("ИНН " + reqs.INN, "right"));
-
 
             //data = data.concat([27, 77, 50, 27, 69, 48, 27, 45, 50, 27, 33, 16, 29, 66, 48, 27, 97, 48, 27, 51, 60, 27, 71, 48]);
             //data = data.concat(Utils.printBundle("АбвгдАбвгдАбвгдАбвгд", "Абвгд", 1));
