@@ -48,7 +48,7 @@ define(function (require) {
             } else return 0;
         }
 
-        self.print = function (aValue, anAlign, aFont) {
+        self.printLine = function (aValue, anAlign, aFont) {
             var data = [];
             data = data.concat([27, 69, 48, 27, 45, 48, 27, 33, aFont ? aFont : 0, 29, 66, 48, 27, 97, 48, 27, 51, 60, 27, 71, 49]);
             switch (anAlign) {
@@ -65,7 +65,53 @@ define(function (require) {
                     data = data.concat([27, 97, 48]);
             }
             data = data.concat(stringToBytes(aValue));
-            data = data.concat([9, 10]);
+            data = data.concat([10]);
+            return data;
+        };
+
+        self.printBundle = function(aFirstValue, aSecondValue, aFont){
+            if (aFont == 'undefined') aFont = 0;
+            var data = [];
+            var tab = 0;
+            var newLine = 0;
+            switch (aFont){
+                case 0: case 16: case 128: case 144:
+                    tab = 4;
+                    if (aFirstValue.length + aSecondValue.length > 42 || aFirstValue.length > 31){
+                        newLine = 1;
+                    }
+                    break;
+                case 32: case 48: case 160: case 176:
+                    tab = 2;
+                    if (aFirstValue.length + aSecondValue.length > 21 || aFirstValue.length > 15){
+                        newLine = 1;
+                    }
+                    break;
+                case 1: case 17:
+                    tab = 5;
+                    if (aFirstValue.length + aSecondValue.length > 52 || aFirstValue.length > 39){
+                        newLine = 1;
+                    }
+                    break;
+                case 33: case 49:
+                    tab = 2;
+                    if (aFirstValue.length + aSecondValue.length > 26 || aFirstValue.length > 15){
+                        newLine = 1;
+                    }
+                    break;
+                default :
+                    tab = 4;
+            }
+            if (aSecondValue.length > 10) tab--;
+            //if (aSecondValue.length > 18) tab--;
+            data = data.concat([27, 69, 48, 27, 45, 48, 27, 33, aFont ? aFont : 0, 29, 66, 48, 27, 97, 48, 27, 51, 60, 27, 71, 49]);
+            data = data.concat(stringToBytes(aFirstValue));
+            for (var counter = 0; counter < tab; counter++){
+                data.push(9);
+            };
+            if (newLine) data.push(10);
+            data = data.concat(stringToBytes(aSecondValue));
+            data.push(10);
             return data;
         };
 
