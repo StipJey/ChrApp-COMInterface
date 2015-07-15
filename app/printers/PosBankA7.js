@@ -115,6 +115,9 @@ define(function(require) {
             for(var item of anOrder.items){
                 data = data.concat(addItem(item));
                 sum += item.cost * item.quantity;
+                if (item.discount) {
+                    sum -= item.cost * item.quantity * item.discount / 100;
+                }
             }
 
             //Скидка на весь чек
@@ -123,19 +126,20 @@ define(function(require) {
                 data = data.concat(Utils.printLine(anOrder.total_discount, "right", 16));
             }
 
+            data = data.concat(Utils.printLine("=========================================="))
             //Итоговая сумма
             //data = data.concat(Utils.printLine("ИТОГ", "left", 176));
             //data = data.concat(Utils.printLine(sum, "right", 176));
-            data = data.concat(Utils.printBundle("ИТОГ", sum, 176));
+            data = data.concat(Utils.printBundle("ИТОГ", (+sum).toFixed(2), 176));
 
 
             //Оплаченная сумма и сдача
             //data = data.concat(Utils.printLine("Наличными", "left", 17));
             //data = data.concat(Utils.printLine(anOrder.money, "right", 17));
-            data = data.concat(Utils.printBundle("Наличными", anOrder.money, 17));
+            data = data.concat(Utils.printBundle("Наличными", (+anOrder.money).toFixed(2), 17));
             //data = data.concat(Utils.printLine("Сдача", "left", 16));
             //data = data.concat(Utils.printLine(sum - anOrder.money, "right", 16));
-            data = data.concat(Utils.printBundle("Сдача", sum - anOrder.money, 16));
+            data = data.concat(Utils.printBundle("Сдача", (+sum - +anOrder.money).toFixed(2), 16));
             return data;
         }
 
@@ -143,7 +147,10 @@ define(function(require) {
             var data = [];
             //data = data.concat(Utils.printLine(anItem.caption));
             //data = data.concat(Utils.printLine(anItem.cost + " x " + anItem.quantity + " " + anItem.measure + "  =" + (anItem.cost * anItem.quantity), "right"));
-            data = Utils.printBundle(anItem.caption, (anItem.cost * anItem.quantity));
+            data = Utils.printBundle(anItem.caption, (+anItem.cost).toFixed(2) + " x " + anItem.quantity + " " + anItem.measure + "  =" + (+anItem.cost * +anItem.quantity).toFixed(2));
+            if (anItem.discount){
+                data = data.concat(Utils.printBundle("Скидка " + anItem.discount + "% ",  "  -" + (+anItem.cost * +anItem.quantity * +anItem.discount / 100).toFixed(2)));
+            }
             return data;
         }
 

@@ -70,48 +70,56 @@ define(function (require) {
         };
 
         self.printBundle = function(aFirstValue, aSecondValue, aFont){
-            if (aFont == 'undefined') aFont = 0;
+            aFirstValue = aFirstValue.toString();
+            aSecondValue = aSecondValue.toString();
+            if (!aFont) aFont = 0;
             var data = [];
-            var tab = 0;
             var newLine = 0;
+            var spaces = 0;
             switch (aFont){
                 case 0: case 16: case 128: case 144:
-                    tab = 4;
-                    if (aFirstValue.length + aSecondValue.length > 42 || aFirstValue.length > 31){
-                        newLine = 1;
+                    if (aFirstValue.length + aSecondValue.length > 42){
+                        newLine = 1; break;
                     }
+                    spaces = 42 - (aFirstValue.length + aSecondValue.length);
                     break;
                 case 32: case 48: case 160: case 176:
-                    tab = 2;
-                    if (aFirstValue.length + aSecondValue.length > 21 || aFirstValue.length > 15){
-                        newLine = 1;
+                    if (aFirstValue.length + aSecondValue.length > 21){
+                        newLine = 1; break;
                     }
+                    spaces = 21 - (aFirstValue.length + aSecondValue.length);
                     break;
                 case 1: case 17:
-                    tab = 5;
-                    if (aFirstValue.length + aSecondValue.length > 52 || aFirstValue.length > 39){
-                        newLine = 1;
+                    if (aFirstValue.length + aSecondValue.length > 54){
+                        newLine = 1; break;
                     }
+                    spaces = 54 - (aFirstValue.length + aSecondValue.length);
                     break;
                 case 33: case 49:
-                    tab = 2;
-                    if (aFirstValue.length + aSecondValue.length > 26 || aFirstValue.length > 15){
-                        newLine = 1;
+                    if (aFirstValue.length + aSecondValue.length > 26){
+                        newLine = 1; break;
                     }
+                    spaces = 26 - (aFirstValue.length + aSecondValue.length);
                     break;
                 default :
-                    tab = 4;
+                    newLine = 0;
+                    spaces = 0;
             }
-            if (aSecondValue.length > 10) tab--;
-            //if (aSecondValue.length > 18) tab--;
+
             data = data.concat([27, 69, 48, 27, 45, 48, 27, 33, aFont ? aFont : 0, 29, 66, 48, 27, 97, 48, 27, 51, 60, 27, 71, 49]);
-            data = data.concat(stringToBytes(aFirstValue));
-            for (var counter = 0; counter < tab; counter++){
-                data.push(9);
-            };
-            if (newLine) data.push(10);
-            data = data.concat(stringToBytes(aSecondValue));
-            data.push(10);
+
+            if (newLine){
+                data = data.concat(self.printLine(aFirstValue, "left", aFont));
+                data = data.concat(self.printLine(aSecondValue, "right", aFont));
+            } else {
+                data = data.concat(stringToBytes(aFirstValue));
+                for (var counter = 0; counter < spaces; counter++){
+                    data.push(32);
+                }
+                data = data.concat(stringToBytes(aSecondValue));
+                data.push(10);
+            }
+
             return data;
         };
 
@@ -126,7 +134,7 @@ define(function (require) {
                     return result;
                 }
             }
-        }
+        };
 
         self.bytesToHex = function (aData) {
             if (Array.isArray(aData)) {

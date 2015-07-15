@@ -98,66 +98,19 @@ QUnit.test( "Подключение", function( assert ) {
 //    window.addEventListener("go", listener);
 //});
 
-QUnit.test("Продажа обычная", function( assert ) {
-    var done = assert.async();
-
-    var order = {
-        items: [{
-            department: "2",
-            code: "323",
-            quantity: "3",
-            cost: "16",
-            measure: "КГ",
-            caption: "Огурцы"
-        }],
-        money : "1000"
-    };
-
-    var event = {
-        evtDest : "go",
-        data : {
-            alias : deviceAlias,
-            method : "sell",
-            params : order
-        }
-    };
-
-    console.log("apimsg:" + JSON.stringify(event));
-
-    var listener = function(evt){
-        console.log(evt);
-        assert.notOk(evt.detail.result, "Продажа прошла" );
-        done();
-        window.removeEventListener("go", listener);
-    }
-
-    window.addEventListener("go", listener);
-});
-
-//QUnit.test("Продажа со скидкой к каждому товару", function( assert ) {
+//QUnit.test("Продажа обычная", function( assert ) {
 //    var done = assert.async();
 //
 //    var order = {
 //        items: [{
 //            department: "2",
 //            code: "323",
-//            discount: "15",
 //            quantity: "3",
 //            cost: "16",
 //            measure: "КГ",
-//            caption: "Огурцы",
-//            discount_type: 0
-//        },{
-//            department: "2",
-//            code: "612",
-//            discount: "40",
-//            quantity: "2",
-//            cost: "200",
-//            measure: "штук",
-//            caption: "Вино Al Donello",
-//            discount_type: 0
+//            caption: "Огурцы"
 //        }],
-//        money : "5000"
+//        money : "1000"
 //    };
 //
 //    var event = {
@@ -180,6 +133,53 @@ QUnit.test("Продажа обычная", function( assert ) {
 //
 //    window.addEventListener("go", listener);
 //});
+
+QUnit.test("Продажа со скидкой к каждому товару", function( assert ) {
+    var done = assert.async();
+
+    var order = {
+        items: [{
+            department: "2",
+            code: "323",
+            discount: "15",
+            quantity: "3",
+            cost: "16",
+            measure: "КГ",
+            caption: "Огурцы",
+            discount_type: 0
+        },{
+            department: "2",
+            code: "612",
+            discount: "40",
+            quantity: "2",
+            cost: "200",
+            measure: "штук",
+            caption: "Вино Al Donello",
+            discount_type: 0
+        }],
+        money : "5000"
+    };
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "sell",
+            params : order
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt){
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Продажа прошла" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
 //
 //QUnit.test("Продажа (за бонусы)", function( assert ) {
 //    var done = assert.async();
