@@ -23,6 +23,35 @@ QUnit.test( "Подключение", function( assert ) {
     });
 });
 
+QUnit.test("Установка реквизитов", function(assert){
+    var done = assert.async();
+    var reqs = {
+        firm : "ООО Рога и Копыта",
+        INN : 321358481157186,
+        cashier : "Петрова О.Н."
+    };
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "setRequisites",
+            params : reqs
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt){
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Реквизиты записаны" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
+
 //QUnit.test("Установка пароля", function( assert ) {
 //    var done = assert.async();
 //
@@ -70,33 +99,33 @@ QUnit.test( "Подключение", function( assert ) {
 //
 //    window.addEventListener("go", listener);
 //});
-//
-//QUnit.test("Регистрация кассира", function( assert ) {
-//    var done = assert.async();
-//
-//    var event = {
-//        evtDest : "go",
-//        data : {
-//            alias : deviceAlias,
-//            method : "openSession",
-//            params : {
-//                number : 1,
-//                family : "Черкасов Евгений"
-//            }
-//        }
-//    };
-//
-//    console.log("apimsg:" + JSON.stringify(event));
-//
-//    var listener = function(evt){
-//        console.log(evt);
-//        assert.notOk(evt.detail.result, "Кассир зарегистрирован" );
-//        done();
-//        window.removeEventListener("go", listener);
-//    }
-//
-//    window.addEventListener("go", listener);
-//});
+
+QUnit.test("Регистрация кассира", function( assert ) {
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "openSession",
+            params : {
+                number : 1,
+                family : "Черкасов Евгений"
+            }
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt){
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Кассир зарегистрирован" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
 
 //QUnit.test("Продажа обычная", function( assert ) {
 //    var done = assert.async();
@@ -129,7 +158,7 @@ QUnit.test( "Подключение", function( assert ) {
 //        assert.notOk(evt.detail.result, "Продажа прошла" );
 //        done();
 //        window.removeEventListener("go", listener);
-//    }
+//    };
 //
 //    window.addEventListener("go", listener);
 //});
@@ -176,7 +205,7 @@ QUnit.test( "Подключение", function( assert ) {
 //        assert.notOk(evt.detail.result, "Продажа прошла" );
 //        done();
 //        window.removeEventListener("go", listener);
-//    }
+//    };
 //
 //    window.addEventListener("go", listener);
 //});
@@ -214,12 +243,12 @@ QUnit.test("Продажа (за бонусы)", function( assert ) {
         assert.notOk(evt.detail.result, "Продажа прошла" );
         done();
         window.removeEventListener("go", listener);
-    }
+    };
 
     window.addEventListener("go", listener);
 });
-//
-//
+
+
 //QUnit.test("Возврат товара", function( assert ) {
 //    var done = assert.async();
 //
@@ -251,81 +280,81 @@ QUnit.test("Продажа (за бонусы)", function( assert ) {
 //        assert.notOk(evt.detail.result, "Возврат прошел" );
 //        done();
 //        window.removeEventListener("go", listener);
-//    }
-//
-//    window.addEventListener("go", listener);
-//});
-//
-//QUnit.test("Отчет X", function(assert){
-//    var done = assert.async();
-//
-//    var event = {
-//        evtDest : "go",
-//        data : {
-//            alias : deviceAlias,
-//            method : "getCashierReport",
-//            params : null
-//        }
 //    };
 //
-//    console.log("apimsg:" + JSON.stringify(event));
-//
-//    var listener = function(evt) {
-//
-//        console.log(evt);
-//        assert.notOk(evt.detail.result, "Отчет Х" );
-//        done();
-//        window.removeEventListener("go", listener);
-//    }
-//
 //    window.addEventListener("go", listener);
 //});
 //
-//QUnit.test("Отчет X", function(assert){
-//    var done = assert.async();
-//
-//    var event = {
-//        evtDest : "go",
-//        data : {
-//            alias : deviceAlias,
-//            method : "getSummaryReport",
-//            params : null
-//        }
-//    };
-//
-//    console.log("apimsg:" + JSON.stringify(event));
-//
-//    var listener = function(evt) {
-//        console.log(evt);
-//        assert.notOk(evt.detail.result, "Отчет Х" );
-//        done();
-//        window.removeEventListener("go", listener);
-//    }
-//
-//    window.addEventListener("go", listener);
-//});
-//
-//QUnit.test("Закрытие смены", function( assert ) {
-//    var done = assert.async();
-//
-//    var event = {
-//        evtDest : "go",
-//        data : {
-//            alias : deviceAlias,
-//            method : "closeSession",
-//            params : null
-//        }
-//    };
-//
-//    console.log("apimsg:" + JSON.stringify(event));
-//
-//    var listener = function(evt) {
-//        console.log(evt);
-//        assert.notOk(evt.detail.result, "Смена закрыта" );
-//        done();
-//        window.removeEventListener("go", listener);
-//    }
-//
-//    window.addEventListener("go", listener);
-//});
+QUnit.test("Отчет X", function(assert){
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "getCashierReport",
+            params : null
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Отчет Х" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
+
+QUnit.test("Отчет X", function(assert){
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "getSummaryReport",
+            params : null
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Отчет Х" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
+
+QUnit.test("Закрытие смены", function( assert ) {
+    var done = assert.async();
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "closeSession",
+            params : null
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Смена закрыта" );
+        done();
+        window.removeEventListener("go", listener);
+    }
+
+    window.addEventListener("go", listener);
+});
 

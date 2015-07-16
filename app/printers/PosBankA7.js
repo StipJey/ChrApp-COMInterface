@@ -22,21 +22,10 @@ define(function(require) {
         function rHandler(buf) {
             var bufView = new Uint8Array(buf);
             for (var i = 0; i < bufView.length; i++) {
-                current_buffer[current_buffer.length] = bufView[i];
+                current_buffer[current_buffer.length] = bufView[i]
+                console.log(bufView);
             }
-            if (current_buffer[current_buffer.length - 1] == 3) {
-                var indexFirst = 0;
-                var index = 0;
-                current_buffer.forEach(function (byte){
-                    if (byte == 2){
-                        indexFirst = index;
-                    }
-                    index++;
-                });
-                current_buffer.splice(0, indexFirst);
-                //CheckResponce(current_buffer);
-                CheckSellResponce(current_buffer);
-            }
+            CheckSellResponce(current_buffer);
         }
 
         var onConnect = function(){
@@ -66,19 +55,59 @@ define(function(require) {
         };
 
         this.openSession = function (aParams) { //открытие смены
+            chrome.storage.local.get("requisites", function(result){
+                result.requisites.cashier = aParams.family;
+                chrome.storage.local.set(result, function(){
+                    var data = [];
+                    data = data.concat(Utils.printLine("Смена открыта: " + aParams.family, "left", 16));
+                    data = data.concat([10, 10, 10, 10, 10]);
+                    data = data.concat([27, 109])
+                    serial.send(Utils.convertArrayToBuffer(data));
+                });
+            });
 
+
+            var responce = {};
+            responce.result = false;
+            responce.method = "openSession";
+            responce.alias = alias;
+            AppAPI(responce,'go');
         };
 
         this.closeSession = function (aFlags, aCallback) {//Закрытие смены
-
+            var responce = {};
+            responce.result = false;
+            responce.method = "closeSession";
+            responce.alias = alias;
+            AppAPI(responce,'go');
         };
 
         this.getCashierReport = function (aFlags, aCashier, aCallback) {
+            var responce = {};
+            var data = [];
+            responce.result = false;
+            responce.method = "getCashierReport";
+            responce.alias = alias;
+            AppAPI(responce,'go');
 
+            data = data.concat(Utils.printLine("Принтер не поддерживает печать отчетов", "left", 16));
+            data = data.concat([10, 10, 10, 10, 10]);
+            data = data.concat([27, 109])
+            serial.send(Utils.convertArrayToBuffer(data));
         };
 
         this.getSummaryReport = function (aFlags, aCallback){
+            var responce = {};
+            var data = [];
+            responce.result = false;
+            responce.method = "getSummaryReport";
+            responce.alias = alias;
+            AppAPI(responce,'go');
 
+            data = data.concat(Utils.printLine("Принтер не поддерживает печать отчетов", "left", 16));
+            data = data.concat([10, 10, 10, 10, 10]);
+            data = data.concat([27, 109])
+            serial.send(Utils.convertArrayToBuffer(data));
         };
 
         this.refund = function(anOrder){
@@ -87,25 +116,39 @@ define(function(require) {
 
         this.sell = function (anOrder) {
             var data = [];
+            var reqs = {};
+            chrome.storage.local.get("requisites", function(result){
+                reqs.firm = result.requisites.firm ? result.requisites.firm : "Не задано";
+                reqs.INN = result.requisites.INN ? result.requisites.INN : "Не задано";
+                reqs.cashier = result.requisites.cashier ? result.requisites.cashier : "Не задано";
 
-            data = data.concat(getHeader());
-            data = data.concat(createBody(anOrder));
-            data = data.concat([10, 10, 10, 10, 10]);
-            data = data.concat([27, 109])
+                data = data.concat(getHeader(reqs));
+                data = data.concat(createBody(anOrder));
+                data = data.concat([10, 10, 10, 10, 10]);
+                data = data.concat([27, 109]);
+                data = data.concat([16,4,1]);
+                serial.send(Utils.convertArrayToBuffer(data));
+            });
+        };
 
-            serial.send(Utils.convertArrayToBuffer(data));
+        //Временное решение
+        this.setRequisites = function(aReqs){
+            var Reqs = {};
+            Reqs.requisites = aReqs;
+            chrome.storage.local.set(Reqs, function(){
+                var responce = {};
+                responce.result = false;
+                responce.method = "setRequisites";
+                responce.alias = alias;
+                AppAPI(responce,'go');
+            });
         };
 
         function CheckSellResponce(buf) {
-            //var responce = CheckBasicResponce(buf);
-            var responce = {result : true};
-            if (responce){
-                responce.method = "sell";
-                responce.alias = alias;
-                AppAPI(responce,'go');
-            } else {
-                AppAPI({result : 9999, method : "sell", alias : alias, description : "Ошибка в ответе от устройства"},'go');
-            }
+            var responce = {};
+            responce.method = "sell";
+            responce.alias = alias;
+            AppAPI(responce,'go');
         }
 
         function createBody(anOrder){
@@ -150,12 +193,13 @@ define(function(require) {
             return data;
         }
 
-        function getHeader(){
-            var reqs = {
-                firm : "ООО Рога и Копыта",
-                INN : 321358481157186,
-                cashier : "Петрова О.Н."
-            };
+        function getHeader(reqs){
+            //var reqs = {
+            //    firm : "ООО Рога и Копыта",
+            //    INN : 321358481157186,
+            //    cashier : "Петрова О.Н."
+            //};
+
             var data = [];
             data = data.concat(Utils.printLine(reqs.firm, "center", 16));
             data = data.concat([9, 10]);

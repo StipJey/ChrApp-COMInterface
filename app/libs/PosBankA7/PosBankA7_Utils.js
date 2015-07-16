@@ -9,7 +9,7 @@ define(function (require) {
         var self = this;
 
         function stringToBytes(aValue) {
-            if (aValue != 'undefined') {
+            if (typeof aValue != 'undefined') {
                 var value = aValue.toString();
                 var len = value.length;
                 var data = [];
@@ -28,25 +28,9 @@ define(function (require) {
             } else return 0;
         }
 
-         self.stringToBytes = function(aValue) {
-            if (aValue != 'undefined') {
-                var value = aValue.toString();
-                var len = value.length;
-                var data = [];
-                for (var i = 0; i < len; i++) {
-                    var code = value.charCodeAt(i);
-                    if (code >= 0 && code <= 255) {
-                        data.push(code);
-                    } else if (ASCII.getExtendASCIICodeFromUTF(code)) {
-                        data.push(ASCII.getExtendASCIICodeFromUTF(code));
-                    } else {
-                        data.push(63); //?
-                        console.error("Недопустимый символ '" + value.charAt(i) + "'");
-                    }
-                }
-                return data;
-            } else return 0;
-        }
+        self.stringToBytes = function(aValue) {
+            return stringToBytes(aValue);
+        };
 
         self.printLine = function (aValue, anAlign, aFont) {
             var data = [];
