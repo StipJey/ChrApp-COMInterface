@@ -249,41 +249,41 @@ QUnit.test("Продажа (за бонусы)", function( assert ) {
 });
 
 
-//QUnit.test("Возврат товара", function( assert ) {
-//    var done = assert.async();
-//
-//    var order = {
-//        items: [{
-//            department: "2",
-//            code: "323",
-//            discount: "15",
-//            quantity: "3",
-//            cost: "16",
-//            measure: "КГ",
-//            caption: "Огурцы"
-//        }]
-//    };
-//
-//    var event = {
-//        evtDest : "go",
-//        data : {
-//            alias : deviceAlias,
-//            method : "refund",
-//            params : order
-//        }
-//    };
-//
-//    console.log("apimsg:" + JSON.stringify(event));
-//
-//    var listener = function(evt) {
-//        console.log(evt);
-//        assert.notOk(evt.detail.result, "Возврат прошел" );
-//        done();
-//        window.removeEventListener("go", listener);
-//    };
-//
-//    window.addEventListener("go", listener);
-//});
+QUnit.test("Возврат товара", function( assert ) {
+    var done = assert.async();
+
+    var order = {
+        items: [{
+            department: "2",
+            code: "323",
+            discount: "15",
+            quantity: "3",
+            cost: "16",
+            measure: "КГ",
+            caption: "Огурцы"
+        }]
+    };
+
+    var event = {
+        evtDest : "go",
+        data : {
+            alias : deviceAlias,
+            method : "refund",
+            params : order
+        }
+    };
+
+    console.log("apimsg:" + JSON.stringify(event));
+
+    var listener = function(evt) {
+        console.log(evt);
+        assert.notOk(evt.detail.result, "Возврат прошел" );
+        done();
+        window.removeEventListener("go", listener);
+    };
+
+    window.addEventListener("go", listener);
+});
 //
 QUnit.test("Отчет X", function(assert){
     var done = assert.async();

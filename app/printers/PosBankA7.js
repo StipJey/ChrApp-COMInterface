@@ -111,7 +111,20 @@ define(function(require) {
         };
 
         this.refund = function(anOrder){
+            var data = [];
+            var reqs = {};
+            chrome.storage.local.get("requisites", function(result){
+                reqs.firm = result.requisites.firm ? result.requisites.firm : "Не задано";
+                reqs.INN = result.requisites.INN ? result.requisites.INN : "Не задано";
+                reqs.cashier = result.requisites.cashier ? result.requisites.cashier : "Не задано";
 
+                data = data.concat(getHeader(reqs));
+                data = data.concat(createBodyRefund(anOrder));
+                data = data.concat([10, 10, 10, 10, 10]);
+                data = data.concat([27, 109]);
+                data = data.concat([16,4,1]);
+                serial.send(Utils.convertArrayToBuffer(data));
+            });
         };
 
         this.sell = function (anOrder) {
@@ -123,7 +136,7 @@ define(function(require) {
                 reqs.cashier = result.requisites.cashier ? result.requisites.cashier : "Не задано";
 
                 data = data.concat(getHeader(reqs));
-                data = data.concat(createBody(anOrder));
+                data = data.concat(createBodySell(anOrder));
                 data = data.concat([10, 10, 10, 10, 10]);
                 data = data.concat([27, 109]);
                 data = data.concat([16,4,1]);
@@ -151,7 +164,7 @@ define(function(require) {
             AppAPI(responce,'go');
         }
 
-        function createBody(anOrder){
+        function createBodySell(anOrder){
             var sum = 0;
             var data = [];
             data = data.concat(Utils.printLine("ПРОДАЖА", "center", 16));
@@ -181,6 +194,35 @@ define(function(require) {
             //Оплаченная сумма и сдача
             data = data.concat(Utils.printBundle("Наличными", (+anOrder.money).toFixed(2), 17));
             data = data.concat(Utils.printBundle("Сдача", (+sum - +anOrder.money).toFixed(2), 16));
+            return data;
+        }
+
+        function createBodyRefund(anOrder){
+            var sum = 0;
+            var data = [];
+            data = data.concat(Utils.printLine("ВОЗВРАТ", "center", 16));
+
+
+            //Обработка товаров
+            for(var item of anOrder.items){
+                data = data.concat(addItem(item));
+                sum += item.cost * item.quantity;
+                if (item.discount) {
+                    sum -= item.cost * item.quantity * item.discount / 100;
+                }
+            }
+
+            //Скидка на весь чек
+            if (anOrder.total_discount) {
+                data = data.concat(Utils.printBundle("Общая скидка на чек", (-anOrder.total_discount).toFixed(2)));
+                sum -= +anOrder.total_discount;
+            }
+
+            data = data.concat(Utils.printLine("=========================================="))
+
+            //Итоговая сумма
+            data = data.concat(Utils.printBundle("ВОЗВРАТ", (+sum).toFixed(2), 176));
+
             return data;
         }
 
@@ -219,6 +261,10 @@ define(function(require) {
 
 
     }
+
+    PosBankA7.information = {
+        type : "printers"
+    };
 
     return PosBankA7;
 });

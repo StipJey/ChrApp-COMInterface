@@ -5,7 +5,8 @@ define(function(){
     function DriversList (){
         var files = {
             "Mercury MS" : "../kkms/MercuryMS",
-            "Mercury-315" : "../scales/Mercury315"
+            "Mercury-315" : "../scales/Mercury315",
+            "PosBank A7" : "../printers/PosBankA7"
         };
 
         this.getDevices = function(aCallback){
