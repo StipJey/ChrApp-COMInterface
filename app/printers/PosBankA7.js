@@ -168,7 +168,7 @@ define(function(require) {
             var sum = 0;
             var data = [];
             data = data.concat(Utils.printLine("ПРОДАЖА", "center", 16));
-
+            data = data.concat(Utils.printLine("=========================================="));
 
             //Обработка товаров
             for(var item of anOrder.items){
@@ -201,7 +201,7 @@ define(function(require) {
             var sum = 0;
             var data = [];
             data = data.concat(Utils.printLine("ВОЗВРАТ", "center", 16));
-
+            data = data.concat(Utils.printLine("=========================================="));
 
             //Обработка товаров
             for(var item of anOrder.items){
@@ -218,7 +218,7 @@ define(function(require) {
                 sum -= +anOrder.total_discount;
             }
 
-            data = data.concat(Utils.printLine("=========================================="))
+            data = data.concat(Utils.printLine("=========================================="));
 
             //Итоговая сумма
             data = data.concat(Utils.printBundle("ВОЗВРАТ", (+sum).toFixed(2), 176));
@@ -236,26 +236,11 @@ define(function(require) {
         }
 
         function getHeader(reqs){
-            //var reqs = {
-            //    firm : "ООО Рога и Копыта",
-            //    INN : 321358481157186,
-            //    cashier : "Петрова О.Н."
-            //};
-
             var data = [];
             data = data.concat(Utils.printLine(reqs.firm, "center", 16));
             data = data.concat([9, 10]);
             data = data.concat(Utils.printBundle(new Date().toLocaleDateString("ru", {year: 'numeric',month: 'numeric',day: 'numeric',hour: 'numeric',minute: 'numeric'}),"Кассир " + reqs.cashier));
             data = data.concat(Utils.printLine("ИНН " + reqs.INN, "right"));
-
-            //data = data.concat([27, 77, 50, 27, 69, 48, 27, 45, 50, 27, 33, 16, 29, 66, 48, 27, 97, 48, 27, 51, 60, 27, 71, 48]);
-            //data = data.concat(Utils.printBundle("АбвгдАбвгдАбвгдАбвгд", "Абвгд", 1));
-            //data = data.concat(Utils.stringToBytes("БукафффкиБукафффкиБукафффкиБукафффки"));
-            //data = data.concat([9, 9, 9, 9]);
-            //data = data.concat([27,97,50]);
-            //data = data.concat(Utils.stringToBytes("500"));
-            //data = data.concat([9, 10]);
-
             return data;
         }
 
