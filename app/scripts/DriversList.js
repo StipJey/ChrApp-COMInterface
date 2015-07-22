@@ -6,7 +6,8 @@ define(function(){
         var files = {
             "Mercury MS" : "../kkms/MercuryMS",
             "Mercury-315" : "../scales/Mercury315",
-            "PosBank A7" : "../printers/PosBankA7"
+            "PosBank A7" : "../printers/PosBankA7",
+            "CustomKubeII" : "../printers/CustomKubeII"
         };
 
         this.getDevices = function(aCallback){
