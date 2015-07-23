@@ -38,6 +38,19 @@ define(function(require){
             }
         };
 
+        this.setOptions = function(aSettings){
+            var anAlias = aSettings.alias;
+            if (this.devices[anAlias] && this.devices[anAlias].options){
+                if (aSettings.bitrate) this.devices[anAlias].options.bitrate = +aSettings.bitrate;
+                if (aSettings.bufferSize) this.devices[anAlias].options.bufferSize = +aSettings.bufferSize;
+                if (aSettings.dataBits) this.devices[anAlias].options.dataBits = aSettings.dataBits;
+                if (aSettings.parityBit) this.devices[anAlias].options.parityBit = aSettings.parityBit;
+                if (aSettings.stopBits) this.devices[anAlias].options.stopBits = aSettings.stopBits;
+            } else {
+                console.log("Ошибка драйвера " + anAlias);
+            }
+        };
+
         this.connectToSavedDevices = function(){
             chrome.storage.local.get('devices', function(result){
                 var devices = result.devices;
@@ -47,6 +60,7 @@ define(function(require){
                             devices[device].file = driversList.getFile(devices[device].name);
                             require([devices[device].file], function (dev) {
                                 self.add(dev, devices[device].settings.alias);
+                                self.setOptions(devices[device].settings);
                                 self.connect(devices[device].settings.alias, devices[device].settings.port);
                                 console.log(devices[device].settings.alias);
                             });

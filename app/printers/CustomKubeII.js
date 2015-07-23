@@ -22,7 +22,7 @@ define(function(require) {
         function rHandler(buf) {
             var bufView = new Uint8Array(buf);
             for (var i = 0; i < bufView.length; i++) {
-                current_buffer[current_buffer.length] = bufView[i]
+                current_buffer[current_buffer.length] = bufView[i];
                 console.log(bufView);
             }
             CheckSellResponce(current_buffer);

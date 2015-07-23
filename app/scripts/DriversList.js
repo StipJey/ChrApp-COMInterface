@@ -51,6 +51,26 @@ define(function(){
                                         }
                                         return arr;
                                     })(deviceName)
+                                },
+                                bufferSize: {
+                                    display : "Размер буфера",
+                                    values : [4096]
+                                },
+                                bitrate: {
+                                    display : "Битрейт",
+                                    values : [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
+                                },
+                                dataBits: {
+                                    display : "Биты данных",
+                                    values : ["seven", "eight"]
+                                },
+                                parityBit: {
+                                    display : "Парность",
+                                    values : ["no", "odd", "even"]
+                                },
+                                stopBits: {
+                                    display : "Стоп-биты",
+                                    values : ["one", "two"]
                                 }
                             }
                         });
