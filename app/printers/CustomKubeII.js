@@ -62,7 +62,8 @@ define(function(require) {
                     data = data.concat([27, 116, 17]);
                     data = data.concat(Utils.printLine("Смена открыта: " + aParams.family, "left", 16));
                     data = data.concat([10, 10, 10, 10, 10]);
-                    data = data.concat([27, 109])
+                    data = data.concat([27, 109]);
+                    data = data.concat([16,4,1]);
                     serial.send(Utils.convertArrayToBuffer(data));
                 });
             });
@@ -93,7 +94,8 @@ define(function(require) {
 
             data = data.concat(Utils.printLine("Принтер не поддерживает печать отчетов", "left", 16));
             data = data.concat([10, 10, 10, 10, 10]);
-            data = data.concat([27, 109])
+            data = data.concat([27, 109]);
+            data = data.concat([16,4,1]);
             serial.send(Utils.convertArrayToBuffer(data));
         };
 
@@ -107,7 +109,8 @@ define(function(require) {
 
             data = data.concat(Utils.printLine("Принтер не поддерживает печать отчетов", "left", 16));
             data = data.concat([10, 10, 10, 10, 10]);
-            data = data.concat([27, 109])
+            data = data.concat([27, 109]);
+            data = data.concat([16,4,1]);
             serial.send(Utils.convertArrayToBuffer(data));
         };
 
