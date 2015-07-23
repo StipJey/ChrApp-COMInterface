@@ -6,11 +6,9 @@ define(function(require){
 
 
         this.options = {
-            //serialOptions: {
-            //    bitrate: 4800,
-            //    parityBit: "even",
-            //    stopBits: "one"
-            //}
+            bitrate: 4800,
+            parityBit: "even",
+            stopBits: "one"
         };
 
         var current_buffer = [];
@@ -50,6 +48,13 @@ define(function(require){
                 this.connection.connect(this.options.devicePath);
             }
         };
+
+        this.openSession = function(){
+            var bytes = new Uint8Array(1);
+            bytes[0] = 2;
+            current_buffer = [];
+            this.connection.send(bytes.buffer);
+        }
     }
 
     Mercury315.information = {
