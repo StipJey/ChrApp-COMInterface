@@ -41,11 +41,11 @@ define(function(require){
         this.setOptions = function(aSettings){
             var anAlias = aSettings.alias;
             if (this.devices[anAlias] && this.devices[anAlias].options){
-                if (aSettings.bitrate) this.devices[anAlias].options.bitrate = +aSettings.bitrate;
-                if (aSettings.bufferSize) this.devices[anAlias].options.bufferSize = +aSettings.bufferSize;
-                if (aSettings.dataBits) this.devices[anAlias].options.dataBits = aSettings.dataBits;
-                if (aSettings.parityBit) this.devices[anAlias].options.parityBit = aSettings.parityBit;
-                if (aSettings.stopBits) this.devices[anAlias].options.stopBits = aSettings.stopBits;
+                if (aSettings.bitrate && aSettings.bitrate != "default") this.devices[anAlias].options.bitrate = +aSettings.bitrate;
+                if (aSettings.bufferSize && aSettings.bufferSize != "default") this.devices[anAlias].options.bufferSize = +aSettings.bufferSize;
+                if (aSettings.dataBits && aSettings.dataBits != "default") this.devices[anAlias].options.dataBits = aSettings.dataBits;
+                if (aSettings.parityBit && aSettings.parityBit != "default") this.devices[anAlias].options.parityBit = aSettings.parityBit;
+                if (aSettings.stopBits && aSettings.stopBits != "default") this.devices[anAlias].options.stopBits = aSettings.stopBits;
             } else {
                 console.log("Ошибка драйвера " + anAlias);
             }

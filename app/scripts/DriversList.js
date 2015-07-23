@@ -54,23 +54,23 @@ define(function(){
                                 },
                                 bufferSize: {
                                     display : "Размер буфера",
-                                    values : [4096]
+                                    values : ["default", 4096]
                                 },
                                 bitrate: {
                                     display : "Битрейт",
-                                    values : [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
+                                    values : ["default", 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
                                 },
                                 dataBits: {
                                     display : "Биты данных",
-                                    values : ["seven", "eight"]
+                                    values : ["default", "seven", "eight"]
                                 },
                                 parityBit: {
                                     display : "Парность",
-                                    values : ["no", "odd", "even"]
+                                    values : ["default", "no", "odd", "even"]
                                 },
                                 stopBits: {
                                     display : "Стоп-биты",
-                                    values : ["one", "two"]
+                                    values : ["default", "one", "two"]
                                 }
                             }
                         });
