@@ -56,12 +56,14 @@ define(function(require) {
 
         this.openSession = function (aParams) { //открытие смены
             chrome.storage.local.get("requisites", function(result){
+                if (!result.requisites)
+                    result.requisites = {};
                 result.requisites.cashier = aParams.family;
                 chrome.storage.local.set(result, function(){
                     var data = [];
                     data = data.concat(Utils.printLine("Смена открыта: " + aParams.family, "left", 16));
                     data = data.concat([10, 10, 10, 10, 10]);
-                    data = data.concat([27, 109])
+                    data = data.concat([27, 109]);
                     serial.send(Utils.convertArrayToBuffer(data));
                 });
             });
@@ -131,9 +133,9 @@ define(function(require) {
             var data = [];
             var reqs = {};
             chrome.storage.local.get("requisites", function(result){
-                reqs.firm = result.requisites.firm ? result.requisites.firm : "Не задано";
-                reqs.INN = result.requisites.INN ? result.requisites.INN : "Не задано";
-                reqs.cashier = result.requisites.cashier ? result.requisites.cashier : "Не задано";
+                reqs.firm = result.requisites && result.requisites.firm ? result.requisites.firm : "Не задано";
+                reqs.INN = result.requisites && result.requisites.INN ? result.requisites.INN : "Не задано";
+                reqs.cashier = result.requisites && result.requisites.cashier ? result.requisites.cashier : "Не задано";
 
                 data = data.concat(getHeader(reqs));
                 data = data.concat(createBodySell(anOrder));
