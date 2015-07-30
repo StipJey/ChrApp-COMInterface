@@ -7,7 +7,8 @@ define(function(){
             "Mercury MS" : "../kkms/MercuryMS",
             "Mercury-315" : "../scales/Mercury315",
             "PosBank A7" : "../printers/PosBankA7",
-            "CustomKubeII" : "../printers/CustomKubeII"
+            "CustomKubeII" : "../printers/CustomKubeII",
+            "BigIITouch" : "../displays/BigIITouch"
         };
 
         this.getDevices = function(aCallback){
@@ -20,6 +21,12 @@ define(function(){
                 },
                 printers    : {
                     display: "Чековый принтер",
+                    values: [{
+                        name: "none"
+                    }]
+                },
+                displays    : {
+                    display: "Дисплей покупателя",
                     values: [{
                         name: "none"
                     }]
