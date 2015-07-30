@@ -18,6 +18,23 @@ define(function(require) {
         var serial = this.connection;
         serial.recieveHandler = rHandler;
 
+        var cmd = {
+            moveCursorLeft : [8],
+            moveCursorRight : [9],
+            clearScreen : [12],
+            moveCursorLeftMost : [13],
+            moveCursorSpecPos : function (aPos){
+                if (aPos <= 20 && aPos >= 1){
+                    return [31, 36, aPos];
+                } else {
+                    return [31, 36, 1];
+                }
+            },
+            selectOverwrite : [31, 1],
+            selectVerticalScroll : [31, 2],
+            selectHorizontalScroll : [31, 3]
+        }
+
         //Обработчики ответов
         function rHandler(buf) {
             var bufView = new Uint8Array(buf);
@@ -78,26 +95,6 @@ define(function(require) {
             AppAPI(responce,'go');
         };
 
-        this.closeSession = function (aFlags, aCallback) {//Закрытие смены
-
-        };
-
-        this.getCashierReport = function (aFlags, aCashier, aCallback) {
-
-        };
-
-        this.getSummaryReport = function (aFlags, aCallback){
-
-        };
-
-        this.refund = function(anOrder){
-
-        };
-
-        this.sell = function (anOrder) {
-
-        };
-
         this.show = function(aMsg){
             ShowMessage(aMsg);
         };
@@ -105,12 +102,13 @@ define(function(require) {
         function ShowMessage(aMsg){
             var data = [];
 
-            data.push(12);
-            data.push(8);
+            data = data.concat(cmd.clearScreen); //Очистить дисплей
             data = data.concat(Utils.stringToBytes(aMsg));
 
             serial.send(Utils.convertArrayToBuffer(data));
         }
+
+
     }
 
     BigIITouch.information = {
