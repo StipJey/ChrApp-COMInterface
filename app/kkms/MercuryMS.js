@@ -478,7 +478,7 @@ define(function(require){
         this.getSummaryReport = function (aFlags, aCallback){
             var flags = aFlags ? aFlags : new Utils.generateReportFlags();
             getReport(49, flags, 0, aCallback);
-        }
+        };
 
         this.refund = function(anOrder){
             fiscal(anOrder, "refund");

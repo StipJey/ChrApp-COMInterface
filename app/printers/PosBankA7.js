@@ -18,6 +18,13 @@ define(function(require) {
         var serial = this.connection;
         serial.recieveHandler = rHandler;
 
+        var cmd = {
+            paperFeed   : [10, 10, 10, 10, 10],
+            getStatus   : [16,4,1],
+            paperCut    : [27, 109],
+            setCharTable: [27, 116, 17]
+        };
+
         //Обработчики ответов
         function rHandler(buf) {
             var bufView = new Uint8Array(buf);
@@ -62,8 +69,7 @@ define(function(require) {
                 chrome.storage.local.set(result, function(){
                     var data = [];
                     data = data.concat(Utils.printLine("Смена открыта: " + aParams.family, "left", 16));
-                    data = data.concat([10, 10, 10, 10, 10]);
-                    data = data.concat([27, 109]);
+                    data = data.concat(getFooter());
                     serial.send(Utils.convertArrayToBuffer(data));
                 });
             });
@@ -93,8 +99,7 @@ define(function(require) {
             AppAPI(responce,'go');
 
             data = data.concat(Utils.printLine("Принтер не поддерживает печать отчетов", "left", 16));
-            data = data.concat([10, 10, 10, 10, 10]);
-            data = data.concat([27, 109])
+            data = data.concat(getFooter());
             serial.send(Utils.convertArrayToBuffer(data));
         };
 
@@ -107,8 +112,7 @@ define(function(require) {
             AppAPI(responce,'go');
 
             data = data.concat(Utils.printLine("Принтер не поддерживает печать отчетов", "left", 16));
-            data = data.concat([10, 10, 10, 10, 10]);
-            data = data.concat([27, 109])
+            data = data.concat(getFooter());
             serial.send(Utils.convertArrayToBuffer(data));
         };
 
@@ -122,9 +126,7 @@ define(function(require) {
 
                 data = data.concat(getHeader(reqs));
                 data = data.concat(createBodyRefund(anOrder));
-                data = data.concat([10, 10, 10, 10, 10]);
-                data = data.concat([27, 109]);
-                data = data.concat([16,4,1]);
+                data = data.concat(getFooter());
                 serial.send(Utils.convertArrayToBuffer(data));
             });
         };
@@ -139,9 +141,7 @@ define(function(require) {
 
                 data = data.concat(getHeader(reqs));
                 data = data.concat(createBodySell(anOrder));
-                data = data.concat([10, 10, 10, 10, 10]);
-                data = data.concat([27, 109]);
-                data = data.concat([16,4,1]);
+                data = data.concat(getFooter());
                 serial.send(Utils.convertArrayToBuffer(data));
             });
         };
@@ -246,6 +246,13 @@ define(function(require) {
             return data;
         }
 
+        function getFooter(){
+            var data = [];
+            data = data.concat(cmd.paperFeed);
+            data = data.concat(cmd.paperCut);
+            data = data.concat(cmd.getStatus);
+            return data;
+        }
 
     }
 
