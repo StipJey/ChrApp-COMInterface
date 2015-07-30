@@ -8,7 +8,8 @@ define(function(){
             "Mercury-315" : "../scales/Mercury315",
             "PosBank A7" : "../printers/PosBankA7",
             "CustomKubeII" : "../printers/CustomKubeII",
-            "BigIITouch" : "../displays/BigIITouch"
+            "BigIITouch" : "../displays/BigIITouch",
+            "Custom My-Printer" : "../printers/CustomMyPrinter"
         };
 
         this.getDevices = function(aCallback){
