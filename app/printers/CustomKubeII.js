@@ -147,6 +147,21 @@ define(function(require) {
             });
         };
 
+        this.printBalance = function(anItems){
+            var data = [];
+            var reqs = {};
+            chrome.storage.local.get("requisites", function(result){
+                reqs.firm = result.requisites && result.requisites.firm ? result.requisites.firm : "Не задано";
+                reqs.INN = result.requisites && result.requisites.INN ? result.requisites.INN : "Не задано";
+                reqs.cashier = result.requisites && result.requisites.cashier ? result.requisites.cashier : "Не задано";
+
+                data = data.concat(getHeader(reqs));
+                data = data.concat(createBodyBalance(anItems));
+                data = data.concat(getFooter());
+                serial.send(Utils.convertArrayToBuffer(data));
+            });
+        };
+
         //Временное решение
         this.setRequisites = function(aReqs){
             var Reqs = {};
@@ -225,6 +240,19 @@ define(function(require) {
 
             //Итоговая сумма
             data = data.concat(Utils.printBundle("ВОЗВРАТ", (+sum).toFixed(2), 176));
+
+            return data;
+        }
+
+        function createBodyBalance(anItems){
+            var sum = 0;
+            var data = [];
+            data = data.concat(Utils.printLine("ОСТАТКИ", "center", 16));
+            data = data.concat(Utils.printLine("=========================================="));
+
+            for (var item of anItems){
+                data = data.concat(Utils.printBundle(item.caption, item.quantity + " " + item.measure));
+            }
 
             return data;
         }
