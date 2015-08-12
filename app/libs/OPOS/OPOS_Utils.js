@@ -53,7 +53,7 @@ define(function (require) {
             return data;
         };
 
-        self.printBundle = function(aFirstValue, aSecondValue, aFont){
+        self.printBundle = function(aOptions, aFirstValue, aSecondValue, aFont){
             aFirstValue = aFirstValue.toString();
             aSecondValue = aSecondValue.toString();
             if (!aFont) aFont = 0;
@@ -62,28 +62,28 @@ define(function (require) {
             var spaces = 0;
             switch (aFont){
                 case 0: case 16: case 128: case 144:
-                    if (aFirstValue.length + aSecondValue.length > 42){
+                    if (aFirstValue.length + aSecondValue.length > aOptions.first){
                         newLine = 1; break;
                     }
-                    spaces = 42 - (aFirstValue.length + aSecondValue.length);
+                    spaces = aOptions.first - (aFirstValue.length + aSecondValue.length);
                     break;
                 case 32: case 48: case 160: case 176:
-                    if (aFirstValue.length + aSecondValue.length > 21){
+                    if (aFirstValue.length + aSecondValue.length > aOptions.firstDouble){
                         newLine = 1; break;
                     }
-                    spaces = 21 - (aFirstValue.length + aSecondValue.length);
+                    spaces = aOptions.firstDouble - (aFirstValue.length + aSecondValue.length);
                     break;
                 case 1: case 17:
-                    if (aFirstValue.length + aSecondValue.length > 54){
+                    if (aFirstValue.length + aSecondValue.length > aOptions.second){
                         newLine = 1; break;
                     }
-                    spaces = 54 - (aFirstValue.length + aSecondValue.length);
+                    spaces = aOptions.second - (aFirstValue.length + aSecondValue.length);
                     break;
                 case 33: case 49:
-                    if (aFirstValue.length + aSecondValue.length > 26){
+                    if (aFirstValue.length + aSecondValue.length > aOptions.secondDouble){
                         newLine = 1; break;
                     }
-                    spaces = 26 - (aFirstValue.length + aSecondValue.length);
+                    spaces = aOptions.secondDouble - (aFirstValue.length + aSecondValue.length);
                     break;
                 default :
                     newLine = 0;
@@ -105,6 +105,14 @@ define(function (require) {
             }
 
             return data;
+        };
+
+        self.printHR = function(aOptions){
+            var line = "";
+            for (var i = 0; i < aOptions.first; i++){
+                line += "=";
+            }
+            return self.printLine(line);
         };
 
         self.convertArrayToBuffer = function (aData) {
