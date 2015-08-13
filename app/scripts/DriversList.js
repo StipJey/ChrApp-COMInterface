@@ -9,8 +9,7 @@ define(function(){
             "PosBank A7" : "../printers/PosBankA7",
             "CustomKubeII" : "../printers/CustomKubeII",
             "BigIITouch" : "../displays/BigIITouch",
-            "Custom My-Printer" : "../printers/CustomMyPrinter",
-            "OPOSDriver" : "../printers/OPOSDriver"
+            "Custom My-Printer" : "../printers/CustomMyPrinter"
         };
 
         this.getDevices = function(aCallback){
