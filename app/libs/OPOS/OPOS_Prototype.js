@@ -14,7 +14,7 @@ define(function(require) {
             parityBit: "no",
             stopBits: "one"
         };
-        this.textAreaOptions = {
+        self.textAreaOptions = {
             first : 42,
             firstDouble : 21,
             second : 54,
@@ -192,7 +192,7 @@ define(function(require) {
             var sum = 0;
             var data = [];
             data = data.concat(Utils.printLine("ПРОДАЖА", "center", 16));
-            data = data.concat(Utils.printHR(this.textAreaOptions));
+            data = data.concat(Utils.printHR(self.textAreaOptions));
 
             //Обработка товаров
             for(var item of anOrder.items){
@@ -205,19 +205,19 @@ define(function(require) {
 
             //Скидка на весь чек
             if (anOrder.total_discount) {
-                data = data.concat(Utils.printBundle(this.textAreaOptions, "Общая скидка на чек", (-anOrder.total_discount).toFixed(2)));
+                data = data.concat(Utils.printBundle(self.textAreaOptions, "Общая скидка на чек", (-anOrder.total_discount).toFixed(2)));
                 sum -= +anOrder.total_discount;
             }
 
-            data = data.concat(Utils.printHR(this.textAreaOptions))
+            data = data.concat(Utils.printHR(self.textAreaOptions))
 
             //Итоговая сумма
-            data = data.concat(Utils.printBundle(this.textAreaOptions, "ИТОГ", (+sum).toFixed(2), 176));
+            data = data.concat(Utils.printBundle(self.textAreaOptions, "ИТОГ", (+sum).toFixed(2), 176));
 
 
             //Оплаченная сумма и сдача
-            data = data.concat(Utils.printBundle(this.textAreaOptions, "Наличными", (+anOrder.money).toFixed(2), 17));
-            data = data.concat(Utils.printBundle(this.textAreaOptions, "Сдача", (+sum - +anOrder.money).toFixed(2), 16));
+            data = data.concat(Utils.printBundle(self.textAreaOptions, "Наличными", (+anOrder.money).toFixed(2), 17));
+            data = data.concat(Utils.printBundle(self.textAreaOptions, "Сдача", (+sum - +anOrder.money).toFixed(2), 16));
             return data;
         };
 
@@ -225,7 +225,7 @@ define(function(require) {
             var sum = 0;
             var data = [];
             data = data.concat(Utils.printLine("ВОЗВРАТ", "center", 16));
-            data = data.concat(Utils.printHR(this.textAreaOptions));
+            data = data.concat(Utils.printHR(self.textAreaOptions));
 
             //Обработка товаров
             for(var item of anOrder.items){
@@ -238,14 +238,14 @@ define(function(require) {
 
             //Скидка на весь чек
             if (anOrder.total_discount) {
-                data = data.concat(Utils.printBundle(this.textAreaOptions, "Общая скидка на чек", (-anOrder.total_discount).toFixed(2)));
+                data = data.concat(Utils.printBundle(self.textAreaOptions, "Общая скидка на чек", (-anOrder.total_discount).toFixed(2)));
                 sum -= +anOrder.total_discount;
             }
 
-            data = data.concat(Utils.printHR(this.textAreaOptions));
+            data = data.concat(Utils.printHR(self.textAreaOptions));
 
             //Итоговая сумма
-            data = data.concat(Utils.printBundle(this.textAreaOptions, "ВОЗВРАТ", (+sum).toFixed(2), 176));
+            data = data.concat(Utils.printBundle(self.textAreaOptions, "ВОЗВРАТ", (+sum).toFixed(2), 176));
 
             return data;
         }
@@ -254,10 +254,10 @@ define(function(require) {
             var sum = 0;
             var data = [];
             data = data.concat(Utils.printLine("ОСТАТКИ", "center", 16));
-            data = data.concat(Utils.printHR(this.textAreaOptions));
+            data = data.concat(Utils.printHR(self.textAreaOptions));
 
             for (var item of anItems){
-                data = data.concat(Utils.printBundle(this.textAreaOptions, item.caption, item.quantity + " " + item.measure));
+                data = data.concat(Utils.printBundle(self.textAreaOptions, item.caption, item.quantity + " " + item.measure));
             }
 
             return data;
@@ -265,9 +265,9 @@ define(function(require) {
 
         function addItem(anItem) {
             var data;
-            data = Utils.printBundle(this.textAreaOptions, anItem.caption, (+anItem.cost).toFixed(2) + " x " + anItem.quantity + " " + anItem.measure + "  =" + (+anItem.cost * +anItem.quantity).toFixed(2));
+            data = Utils.printBundle(self.textAreaOptions, anItem.caption, (+anItem.cost).toFixed(2) + " x " + anItem.quantity + " " + anItem.measure + "  =" + (+anItem.cost * +anItem.quantity).toFixed(2));
             if (anItem.discount){
-                data = data.concat(Utils.printBundle(this.textAreaOptions, "Скидка " + anItem.discount + "% ",  "  -" + (+anItem.cost * +anItem.quantity * +anItem.discount / 100).toFixed(2)));
+                data = data.concat(Utils.printBundle(self.textAreaOptions, "Скидка " + anItem.discount + "% ",  "  -" + (+anItem.cost * +anItem.quantity * +anItem.discount / 100).toFixed(2)));
             }
             return data;
         }
@@ -276,7 +276,7 @@ define(function(require) {
             var data = [];
             data = data.concat(Utils.printLine(reqs.firm, "center", 16));
             data = data.concat([9, 10]);
-            data = data.concat(Utils.printBundle(this.textAreaOptions, new Date().toLocaleDateString("ru", {year: 'numeric',month: 'numeric',day: 'numeric',hour: 'numeric',minute: 'numeric'}),"Кассир " + reqs.cashier));
+            data = data.concat(Utils.printBundle(self.textAreaOptions, new Date().toLocaleDateString("ru", {year: 'numeric',month: 'numeric',day: 'numeric',hour: 'numeric',minute: 'numeric'}),"Кассир " + reqs.cashier));
             data = data.concat(Utils.printLine("ИНН " + reqs.INN, "right"));
             return data;
         }
