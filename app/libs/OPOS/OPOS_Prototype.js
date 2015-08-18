@@ -1,3 +1,4 @@
+/* global chrome */
 define(function(require) {
     var SerialConnection = require('../SerialConnection');
     var AppAPI = require('AppAPI');
@@ -110,17 +111,50 @@ define(function(require) {
             serial.send(Utils.convertArrayToBuffer(data));
         };
 
-        this.getSummaryReport = function (aFlags, aCallback){
+        this.getSummaryReport = function (anInfo){
             var responce = {};
             var data = [];
             responce.result = false;
             responce.method = "getSummaryReport";
             responce.alias = alias;
             AppAPI(responce,'go');
-
-            data = data.concat(Utils.printLine("Принтер не поддерживает печать отчетов", "left", 16));
-            data = data.concat(getFooter());
-            serial.send(Utils.convertArrayToBuffer(data));
+            var reqs = {};
+            function print(aObj){
+                if (aObj.length == 2){
+                    if (typeof aObj[0] == "array" && typeof aObj[1] != "array"){
+                        print(aObj[0]);
+                        data = data.concat(Utils.printLine(aObj[1]));
+                    } 
+                    if (typeof aObj[1] == "array" && typeof aObj[0] != "array"){
+                        data = data.concat(Utils.printLine(aObj[0]));
+                        print(aObj[1]);
+                    } 
+                    if (typeof aObj[0] != "array" && typeof aObj[1] != "array") {
+                        data = data.concat(Utils.printBundle(self.textAreaOptions, aObj[0], aObj[1]));
+                    }
+                } else {
+                    aObj.forEach(function(element) {
+                    if (typeof element !== "array"){
+                        data = data.concat(Utils.printLine(element));
+                    } else {
+                        print(element);
+                    }
+                }, this);
+                }
+                
+            }
+            
+            chrome.storage.local.get("requisites", function(result){
+                reqs.firm = result.requisites && result.requisites.firm ? result.requisites.firm : "Не задано";
+                reqs.INN = result.requisites && result.requisites.INN ? result.requisites.INN : "Не задано";
+                reqs.cashier = result.requisites && result.requisites.cashier ? result.requisites.cashier : "Не задано";
+                data = data.concat(getHeader(reqs));
+                anInfo.forEach(function(aItem){
+                    print(aItem);
+                });
+                data = data.concat(getFooter());
+                serial.send(Utils.convertArrayToBuffer(data));
+            });
         };
 
         this.refund = function(anOrder){
