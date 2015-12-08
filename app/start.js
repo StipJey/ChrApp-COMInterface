@@ -4,5 +4,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
     minHeight: 768,
     //state: "fullscreen",
     id: "4RPOS"
-  });
+  }, function(win) {
+    win.maximize();
+	});
 });
